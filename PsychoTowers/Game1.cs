@@ -1,9 +1,19 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace PsychoTowers
 {
+
+
+    public enum GameState
+    {
+
+    }
+
+
+
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -11,6 +21,8 @@ namespace PsychoTowers
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Map active;
+        public static Random Rand { get; set; }
 
         public Game1()
         {
@@ -27,7 +39,8 @@ namespace PsychoTowers
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            active = new Map();
+            Rand = new Random();
             base.Initialize();
         }
 
@@ -39,6 +52,14 @@ namespace PsychoTowers
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            SpriteManager.SquareTestTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.BackgroundTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.BorderTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.CreepTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.EmptyTowerSlotTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.WallTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.TeamCoreTexture = Content.Load<Texture2D>("Square");
+
 
             // TODO: use this.Content to load your game content here
         }
@@ -62,7 +83,10 @@ namespace PsychoTowers
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            //active.PlaceBlock(Rand.Next(2, active.TileData.GetLength(0) - 2), Rand.Next(1, active.TileData.GetLength(1) - 1));
+            active.PlaceBlock(Rand.Next(2, active.TileData.GetLength(0) - 2), Rand.Next(1, active.TileData.GetLength(1) - 1));
+            active.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
+
 
             base.Update(gameTime);
         }
@@ -75,7 +99,9 @@ namespace PsychoTowers
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+            SpriteManager.DrawMap(spriteBatch, active);
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

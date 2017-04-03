@@ -8,10 +8,11 @@ namespace PsychoTowers
 {
     public enum Team
     {
+        None,
         Team1,
         Team2
     }
-    public enum Direction { Right, Left, Up, Down }
+    public enum Direction { None, Right, Left, Up, Down }
 
     /// <summary>
     /// Represents a mob trying to get through the maze
@@ -22,27 +23,29 @@ namespace PsychoTowers
         #region Orientation
         //Positional Info
         private float x;
+        private int lastX;
         public float X
         {
             get { return x; }
             set
             {
-                //if(!MapData.TileData[(int)value, (int)Y].HasFlag(TileProperties.Blocked) && !MapData.TileData[(int)(value + .8f), (int)(Y + .8f)].HasFlag(TileProperties.Blocked) && 
-                //    !MapData.TileData[(int)value, (int)(Y + .8f)].HasFlag(TileProperties.Blocked) && !MapData.TileData[(int)(value + .8f), (int)(Y)].HasFlag(TileProperties.Blocked))
-                x = value;
-                currentTile = MapData.TileData[(int)X,(int)Y];
+                if (value >= 0 && value <= MapData.TileData.GetLength(0) - 1)
+                {
+                    x = value;
+                }
             }
         }
         private float y;
+        private int lastY;
         public float Y
         {
             get { return y; }
             set
             {
-                //if (!MapData.TileData[(int)X, (int)value].HasFlag(TileProperties.Blocked) && !MapData.TileData[(int)(X + .8f), (int)(value + .8f)].HasFlag(TileProperties.Blocked) &&
-                //     !MapData.TileData[(int)X, (int)(value + .8f)].HasFlag(TileProperties.Blocked) && !MapData.TileData[(int)(X + .8f), (int)(value)].HasFlag(TileProperties.Blocked))
-                y = value;
-                currentTile = MapData.TileData[(int)X, (int)Y];
+                if(value >= 0 && value <= MapData.TileData.GetLength(1) - 1)
+                {
+                    y = value;
+                }
             }
         }
 
@@ -132,7 +135,7 @@ namespace PsychoTowers
         #endregion
 
 
-        public Creep(int health, float speed, int attack, int armor, Map map, Team team, int x, int y)
+        public Creep(int health, float speed, int attack, int armor, Map map, Team team, int xParam, int yParam)
         {
             Alive = true;
             MaxHealth = health;
@@ -142,48 +145,145 @@ namespace PsychoTowers
             Armor = armor;
             MapData = map;
             MyTeam = team;
-            X = x;
-            Y = y;
+            x = xParam;
+            y = yParam;
+            lastX = (int)x;
+            lastY = (int)y;
+            Reface();
         }
 
 
 
+
+        public void Step(float deltaTime, bool heartbeat)
+        {
+
+            Move(Facing, deltaTime);
+            if (DetermineReface())
+            {
+                Reface();
+            }
+
+        }
+
+
+        private bool DetermineReface()
+        {
+            switch (Facing)
+            {
+                case Direction.Right:
+                    return (int)X > lastX;
+                case Direction.Left:
+                    return (int)X < lastX - 1;
+                case Direction.Up:
+                    return (int)Y < lastY - 1;
+                case Direction.Down:
+                    return (int)Y > lastY;
+                default:
+                    break;
+            }
+
+
+            return false;
+        }
 
 
 
 
         #region Actions
 
-        //Move in a given direction
-        public void Move(Direction direct)
+        private void Reface()
         {
-            //Update orientation
-            Facing = direct;
-            switch (direct)
+            switch (Facing)
             {
                 case Direction.Right:
-                    if (MapData.TileData[(int)(X + speed + 1), (int)Y].HasFlag(TileProperties.Blocked))
-                        X = (int)(X + speed);
-                    else
-                        X += Speed;
+                    lastX++;
                     break;
                 case Direction.Left:
-                    if (MapData.TileData[(int)(X - speed), (int)Y].HasFlag(TileProperties.Blocked))
-                        X = (int)(X - speed + 1);
-                    else
-                        X -= Speed;
+                    lastX--;
                     break;
                 case Direction.Up:
+                    lastY--;
                     break;
                 case Direction.Down:
+                    lastY++;
                     break;
                 default:
                     break;
             }
+            X = lastX;
+            y = lastY;
+            if (MyTeam == Team.Team1)
+                Facing = MapData.TeamOnePath[lastX, lastY];
+            if (MyTeam == Team.Team2)
+                Facing = MapData.TeamTwoPath[lastX, lastY];
+            currentTile = MapData.TileData[lastX, lastY];
+
         }
 
 
+        //Move in a given direction
+        public void Move(Direction direct, float deltaTime)
+        {
+            //Update orientation
+            float displacement = Speed * deltaTime;
+            switch (direct)
+            {
+                case Direction.Right:
+                    if (lastX + 2 <= MapData.TileData.GetLength(0))
+                        if (MapData.TileData[lastX + 1, lastY].HasFlag(TileProperties.Blocked))
+                        {
+                            X = (int)(X + displacement);
+                            Reface();
+                        }
+                        else
+                            x += displacement;
+                    break;
+                case Direction.Left:
+                    if (lastX >= 1)
+                        if (MapData.TileData[lastX - 1, lastY].HasFlag(TileProperties.Blocked))
+                        {
+                            X = (int)(X - displacement + 1);
+                            Reface();
+                        }
+                        else
+                            x -= displacement;
+                    break;
+                case Direction.Up:
+                    if (lastY >= 1)
+                        if (MapData.TileData[lastX, lastY - 1].HasFlag(TileProperties.Blocked))
+                        {
+                            Y = (int)(Y - displacement + 1);
+                            Reface();
+                        }
+                        else
+                            Y -= displacement;
+                    break;
+                case Direction.Down:
+                    if (lastY + 2 <= MapData.TileData.GetLength(1))
+                        if (MapData.TileData[lastX, lastY + 1].HasFlag(TileProperties.Blocked))
+                        {
+                            Y = (int)(Y + displacement);
+                            Reface();
+                        }
+                        else
+                            Y += displacement;
+                    break;
+                default:
+                    break;
+            }
+            
+        }
 
+        
+        
+        
+        
+        //Assault enemy TeamCore
+        public void Strike(TeamCore other)
+        {
+            other.Health--;
+        }
 
 
         //Assaults the other Creep dealing damage

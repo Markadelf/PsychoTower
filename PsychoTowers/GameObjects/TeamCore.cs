@@ -52,7 +52,7 @@ namespace PsychoTowers
             Y = y;
             MyTeam = team;
             MapData = mapdata;
-            Level = 1;
+            Level = 0;
             Health = 10;
         }
 
@@ -67,7 +67,9 @@ namespace PsychoTowers
         //Factory
         public Creep NewCreep()
         {
-            return new Creep(10 * Level, .5f + .01f * Level, 5 * Level, 5 * Level, MapData, MyTeam, X, Y);
+            if (Level < 10000)
+                Level++;
+            return new Creep(10 * Level, 0.5f + .01f * Level, 5 * Level, 5 * Level, MapData, MyTeam, X, Y);
         }
 
     }
