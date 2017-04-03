@@ -221,7 +221,52 @@ namespace PsychoTowers
             return false;
         }
 
-        
+        public bool CheckCollision(Creep other, float displacement)
+        {
+            switch (Facing)
+            {
+                case Direction.None:
+                    return false;
+                case Direction.Right:
+                    if (X + 1 + displacement < other.X)
+                        return false;
+                    if (Y > other.Y + 1)
+                        return false;
+                    if (Y + 1 < other.Y)
+                        return false;
+                    return true;
+                case Direction.Left:
+                    if (X - displacement > other.X + 1)
+                        return false;
+                    if (Y > other.Y + 1)
+                        return false;
+                    if (Y + 1 < other.Y)
+                        return false;
+                    return true;
+                case Direction.Up:
+                    if (Y - displacement > other.Y + 1)
+                        return false;
+                    if (X > other.X + 1)
+                        return false;
+                    if (X + 1 < other.X)
+                        return false;
+                    return true;
+                case Direction.Down:
+                    if (Y + displacement + 1 < other.Y)
+                        return false;
+                    if (X > other.X + 1)
+                        return false;
+                    if (X + 1 < other.X)
+                        return false;
+                    return true;
+                default:
+                    return false;
+            }
+
+
+
+
+        }
 
         #endregion
 
