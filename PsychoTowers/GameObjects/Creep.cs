@@ -62,6 +62,7 @@ namespace PsychoTowers
         //Which direction am I facing
         public Direction Facing { get; set; }
 
+        public Creep Target;
 
         #endregion
 
@@ -150,6 +151,7 @@ namespace PsychoTowers
             lastX = (int)x;
             lastY = (int)y;
             Reface();
+            Target = null;
         }
 
 
@@ -158,13 +160,45 @@ namespace PsychoTowers
         public void Step(float deltaTime, bool heartbeat)
         {
 
-            Move(Facing, deltaTime);
-            if (DetermineReface())
+            if(Target == null)
             {
-                Reface();
+                Move(Facing, deltaTime);
+                if (DetermineReface())
+                {
+                    Reface();
+                }
             }
+            else
+            {
+                if(heartbeat && MyTeam == Team.Team1)
+                {
+                    Strike(Target);
+                    Target.Strike(this);
+                    if (Alive && !Target.Alive)
+                    {
+                        MaxHealth += Target.MaxHealth;
+                        attack += Target.attack;
+                        speed += Target.speed;
+                        armor += Target.armor;
+                        Target = null;
+                    }
+                    else if(!Alive && Target.Alive)
+                    {
+                        Target.MaxHealth += MaxHealth;
+                        Target.attack += attack;
+                        Target.speed += speed;
+                        Target.armor += armor;
+                        Target.Target = null;
+                    }
+                }
+                    
+            }
+            
 
         }
+
+
+        #region Logic
 
 
         private bool DetermineReface()
@@ -179,16 +213,17 @@ namespace PsychoTowers
                     return (int)Y < lastY - 1;
                 case Direction.Down:
                     return (int)Y > lastY;
-                default:
-                    break;
+                case Direction.None:
+                    return true;
             }
 
 
             return false;
         }
 
+        
 
-
+        #endregion
 
         #region Actions
 
@@ -218,7 +253,6 @@ namespace PsychoTowers
             if (MyTeam == Team.Team2)
                 Facing = MapData.TeamTwoPath[lastX, lastY];
             currentTile = MapData.TileData[lastX, lastY];
-
         }
 
 

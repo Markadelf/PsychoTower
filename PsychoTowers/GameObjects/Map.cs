@@ -105,11 +105,23 @@ namespace PsychoTowers
 
             for(int i = 0; i < TeamOne.Count; i++)
             {
-                TeamOne[i].Step(deltaTime, heartbeat);
+                if(TeamOne[i].Alive)
+                    TeamOne[i].Step(deltaTime, heartbeat);
+                else
+                {
+                    TeamOne.RemoveAt(i);
+                    i--;
+                }
             }
             for (int i = 0; i < TeamTwo.Count; i++)
             {
-                TeamTwo[i].Step(deltaTime, heartbeat);
+                if (TeamTwo[i].Alive)
+                    TeamTwo[i].Step(deltaTime, heartbeat);
+                else
+                {
+                    TeamTwo.RemoveAt(i);
+                    i--;
+                }
             }
             if (heartbeat)
             {
@@ -124,7 +136,7 @@ namespace PsychoTowers
         }
 
 
-
+     
 
 
 
