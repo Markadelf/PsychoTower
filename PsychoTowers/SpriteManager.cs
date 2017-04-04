@@ -91,40 +91,6 @@ namespace PsychoTowers
             //    }
             //}
 
-
-
-
-
-            
-
-            //Draw Towers
-            for (int i = 0; i < mapdata.TowerData.GetLength(0); i++)
-            {
-                for (int j = 0; j < mapdata.TowerData.GetLength(1); j++)
-                {
-                    if (mapdata.TowerData[i, j] == null)
-                        sb.Draw(EmptyTowerSlotTexture, new Rectangle(DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale, DrawMapScale, DrawMapScale), Color.Brown);
-                }
-            }
-
-            //Draw Team Cores
-            if(false)
-            sb.Draw(TeamCoreTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamOneCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOneCore.Y * DrawMapScale), DrawMapScale, DrawMapScale), Color.Red);
-            if(false)
-             sb.Draw(TeamCoreTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamTwoCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwoCore.Y * DrawMapScale), DrawMapScale, DrawMapScale), Color.Blue);
-
-
-
-            //Draw Team Creeps
-            for (int i = 0; i < mapdata.TeamOne.Count; i++)
-            {
-                sb.Draw(CreepTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamOne[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOne[i].Y * DrawMapScale), DrawMapScale, DrawMapScale), Color.Red);
-            }
-            for (int i = 0; i < mapdata.TeamTwo.Count; i++)
-            {
-                sb.Draw(CreepTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamTwo[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwo[i].Y * DrawMapScale), DrawMapScale, DrawMapScale), Color.Blue);
-            }
-
             //Draw Walls
             for (int i = 0; i < mapdata.TileData.GetLength(0); i++)
             {
@@ -139,6 +105,38 @@ namespace PsychoTowers
                     }
                 }
             }
+
+
+
+
+
+            //Draw Towers
+            for (int i = 0; i < mapdata.TowerData.GetLength(0); i++)
+            {
+                for (int j = 0; j < mapdata.TowerData.GetLength(1); j++)
+                {
+                    if (mapdata.TowerData[i, j] == null)
+                        sb.Draw(EmptyTowerSlotTexture, new Rectangle(DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale, DrawMapScale, DrawMapScale), Color.Brown);
+                }
+            }
+
+            //Draw Team Cores
+            sb.Draw(TeamCoreTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamOneCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOneCore.Y * DrawMapScale), DrawMapScale, DrawMapScale), Color.Red);
+            sb.Draw(TeamCoreTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamTwoCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwoCore.Y * DrawMapScale), DrawMapScale, DrawMapScale), Color.Blue);
+
+
+
+            //Draw Team Creeps
+            for (int i = 0; i < mapdata.TeamOne.Count; i++)
+            {
+                sb.Draw(CreepTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamOne[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOne[i].Y * DrawMapScale), DrawMapScale, DrawMapScale), Color.Red);
+            }
+            for (int i = 0; i < mapdata.TeamTwo.Count; i++)
+            {
+                sb.Draw(CreepTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamTwo[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwo[i].Y * DrawMapScale), DrawMapScale, DrawMapScale), Color.Blue);
+            }
+
+            
 
 
         }//End Draw

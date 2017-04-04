@@ -22,18 +22,20 @@ namespace PsychoTowers
         public bool Alive { get; set; }
 
         //Stats
-        public int Level { get; set; }
+        public static int Level { get; set; }
         private int health;
+
+        public static float RespawnTimer { get; set; }
 
         public int Health
         {
             get { return health; }
             set
             {
-                if (health > value)
+                if (health > value && Alive)
                 {
                     health = value;
-                    if (health > 0)
+                    if (Alive)
                     {
                         Pulse();
                     }
@@ -53,23 +55,30 @@ namespace PsychoTowers
             MyTeam = team;
             MapData = mapdata;
             Level = 0;
-            Health = 10;
+            health = 10;
+            RespawnTimer = 0;
         }
+
 
 
         //Large Pulse Attack that the core uses whenever it takes damage
         public void Pulse()
         {
-
+            for(int i = 0; i < MapData.TeamOne.Count;i++)
+            {
+                MapData.TeamOne[i].Alive = false;
+            }
+            for (int i = 0; i < MapData.TeamTwo.Count; i++)
+            {
+                MapData.TeamTwo[i].Alive = false;
+            }
         }
 
 
         //Factory
         public Creep NewCreep()
         {
-            if (Level < 10000)
-                Level++;
-            return new Creep(10 * Level, 0.5f + .01f * Level, 5 * Level, 5 * Level, MapData, MyTeam, X, Y);
+            return new Creep(20 + 1 * Level, 1.5f + .01f * Level * Level, 10 * Level * Level, 5 * Level, MapData, MyTeam, X, Y);
         }
 
     }

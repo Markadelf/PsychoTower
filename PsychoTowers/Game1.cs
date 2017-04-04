@@ -83,8 +83,8 @@ namespace PsychoTowers
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            //active.PlaceBlock(Rand.Next(2, active.TileData.GetLength(0) - 2), Rand.Next(1, active.TileData.GetLength(1) - 1));
             active.PlaceBlock(Rand.Next(2, active.TileData.GetLength(0) - 2), Rand.Next(1, active.TileData.GetLength(1) - 1));
+            //active.PlaceBlock(Rand.Next(3, active.TileData.GetLength(0) - 3), Rand.Next(1, active.TileData.GetLength(1) - 1));
             active.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
 
 

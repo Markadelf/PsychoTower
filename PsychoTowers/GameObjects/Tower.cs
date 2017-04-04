@@ -8,5 +8,7 @@ namespace PsychoTowers
 {
     public class Tower
     {
+        //Square radius around the Tower
+        public int Range { get; set; }
     }
 }

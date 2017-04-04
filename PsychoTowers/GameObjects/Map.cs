@@ -19,7 +19,7 @@ namespace PsychoTowers
         ArmorNerf = 16,
         SpeedBuff = 32,
         SpeedNerf = 64,
-        HealingAura = 128
+        DoubleXP = 128
     }
 
 
@@ -98,16 +98,15 @@ namespace PsychoTowers
             if (HeartBeatTimer <= 0)
             {
                 heartbeat = true;
-                HeartBeatTimer += 5f;
+                HeartBeatTimer += 2f;
             }
             else
                 heartbeat = false;
 
             for(int i = 0; i < TeamOne.Count; i++)
             {
-                if(TeamOne[i].Alive)
-                    TeamOne[i].Step(deltaTime, heartbeat);
-                else
+                TeamOne[i].Step(deltaTime, heartbeat);
+                if (!TeamOne[i].Alive)
                 {
                     TeamOne.RemoveAt(i);
                     i--;
@@ -115,18 +114,40 @@ namespace PsychoTowers
             }
             for (int i = 0; i < TeamTwo.Count; i++)
             {
-                if (TeamTwo[i].Alive)
-                    TeamTwo[i].Step(deltaTime, heartbeat);
-                else
+                TeamTwo[i].Step(deltaTime, heartbeat);
+                if (!TeamTwo[i].Alive)
                 {
                     TeamTwo.RemoveAt(i);
                     i--;
                 }
             }
-            if (heartbeat)
+            TeamCore.RespawnTimer -= deltaTime;
+            if (TeamCore.RespawnTimer <= 0)
             {
-                TeamOne.Add(TeamOneCore.NewCreep());
-                TeamTwo.Add(TeamTwoCore.NewCreep());
+                if (TeamCore.Level < 144)
+                    TeamCore.Level++;
+                TeamCore.RespawnTimer += 5;
+                bool spawnSafe = true;
+                for (int i = 0; i < TeamOne.Count; i++)
+                {
+                    if (TeamOne[i].CheckCollision(TeamOneCore))
+                    {
+                        spawnSafe = false;
+                    }
+                }
+                if (spawnSafe)
+                    TeamOne.Add(TeamOneCore.NewCreep());
+                
+                spawnSafe = true;
+                for (int i = 0; i <TeamTwo.Count; i++)
+                {
+                    if (TeamTwo[i].CheckCollision(TeamTwoCore))
+                    {
+                        spawnSafe = false;
+                    }
+                }
+                if(spawnSafe)
+                    TeamTwo.Add(TeamTwoCore.NewCreep());
             }
             
 

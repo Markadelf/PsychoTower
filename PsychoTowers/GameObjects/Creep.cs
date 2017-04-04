@@ -23,7 +23,7 @@ namespace PsychoTowers
         #region Orientation
         //Positional Info
         private float x;
-        private int lastX;
+        public int LastX { get; set; }
         public float X
         {
             get { return x; }
@@ -36,7 +36,7 @@ namespace PsychoTowers
             }
         }
         private float y;
-        private int lastY;
+        public int LastY { get; set; }
         public float Y
         {
             get { return y; }
@@ -77,7 +77,7 @@ namespace PsychoTowers
             {
                 if(value < MaxHealth)
                     health = value;
-                if (health < 0)
+                if (health <= 0)
                     Alive = false;
             }
         }
@@ -140,7 +140,7 @@ namespace PsychoTowers
         {
             Alive = true;
             MaxHealth = health;
-            Health = health;
+            this.health = health;
             Speed = speed;
             Attack = attack;
             Armor = armor;
@@ -148,8 +148,8 @@ namespace PsychoTowers
             MyTeam = team;
             x = xParam;
             y = yParam;
-            lastX = (int)x;
-            lastY = (int)y;
+            LastX = (int)x;
+            LastY = (int)y;
             Reface();
             Target = null;
         }
@@ -159,36 +159,35 @@ namespace PsychoTowers
 
         public void Step(float deltaTime, bool heartbeat)
         {
+            if (MyTeam == Team.Team1 && CheckCollision(MapData.TeamTwoCore))
+                Strike(MapData.TeamTwoCore);
+            if (MyTeam == Team.Team2 && CheckCollision(MapData.TeamOneCore))
+                Strike(MapData.TeamOneCore);
 
-            if(Target == null)
+            if (Target == null)
             {
-                Move(Facing, deltaTime);
-                if (DetermineReface())
-                {
-                    Reface();
-                }
+                for(float displacement = Speed * deltaTime; displacement > 0; displacement = Move(Facing, displacement))
+                    if (DetermineReface())
+                    {
+                        Reface();
+
+                    }
             }
             else
             {
-                //if(heartbeat && MyTeam == Team.Team1)
+                Nudge(Facing);
+                if(heartbeat)
                 {
                     Strike(Target);
                     if (!Target.Alive)
                     {
-                        MaxHealth += Target.MaxHealth / 3;
-                        attack += Target.attack / 3;
+                        attack += Target.attack / 2;
                         speed += Target.speed / 3;
-                        armor += Target.armor / 3;
+                        armor += Target.armor;
                         Target = null;
+                        if (Speed > 2075.1f)
+                            Speed = 2075.1f;
                     }
-                    //else if(!Alive && Target.Alive)
-                    //{
-                    //    Target.MaxHealth += MaxHealth;
-                    //    Target.attack += attack;
-                    //    Target.speed += speed;
-                    //    Target.armor += armor;
-                    //    Target.Target = null;
-                    //}
                 }
                     
             }
@@ -205,18 +204,16 @@ namespace PsychoTowers
             switch (Facing)
             {
                 case Direction.Right:
-                    return (int)X > lastX;
+                    return (int)X > LastX;
                 case Direction.Left:
-                    return (int)X < lastX - 1;
+                    return (int)X < LastX - 1;
                 case Direction.Up:
-                    return (int)Y < lastY - 1;
+                    return (int)Y < LastY - 1;
                 case Direction.Down:
-                    return (int)Y > lastY;
+                    return (int)Y > LastY;
                 case Direction.None:
-                    return true;
+                    return false;
             }
-
-
             return false;
         }
 
@@ -229,7 +226,7 @@ namespace PsychoTowers
                 case Direction.None:
                     return false;
                 case Direction.Right:
-                    if (X + displacement + 1 <= other.X || X > other.X)
+                    if (X + displacement + 1 < other.X || X > other.X)
                         return false;
                     if (Y >= other.Y + 1)
                         return false;
@@ -237,7 +234,7 @@ namespace PsychoTowers
                         return false;
                     return true;
                 case Direction.Left:
-                    if (X - displacement >= other.X + 1|| X < other.X)
+                    if (X - displacement > other.X + 1|| X < other.X)
                         return false;
                     if (Y >= other.Y + 1)
                         return false;
@@ -245,7 +242,7 @@ namespace PsychoTowers
                         return false;
                     return true;
                 case Direction.Up:
-                    if (Y - displacement >= other.Y + 1|| Y < other.Y)
+                    if (Y - displacement > other.Y + 1|| Y < other.Y)
                         return false;
                     if (X >= other.X + 1)
                         return false;
@@ -253,7 +250,7 @@ namespace PsychoTowers
                         return false;
                     return true;
                 case Direction.Down:
-                    if (Y + displacement + 1 <= other.Y || Y > other.Y)
+                    if (Y + displacement + 1 < other.Y || Y > other.Y)
                         return false;
                     if (X >= other.X + 1)
                         return false;
@@ -263,11 +260,53 @@ namespace PsychoTowers
                 default:
                     return false;
             }
-
-
-
-
         }
+
+        public bool CheckCollision(TeamCore other)
+        {
+            switch (Facing)
+            {
+                case Direction.None:
+                    return false;
+                case Direction.Right:
+                    if (X + .1 + 1 <= other.X || X > other.X)
+                        return false;
+                    if (Y >= other.Y + 1)
+                        return false;
+                    if (Y + 1 <= other.Y)
+                        return false;
+                    return true;
+                case Direction.Left:
+                    if (X - .1 >= other.X + 1 || X < other.X)
+                        return false;
+                    if (Y >= other.Y + 1)
+                        return false;
+                    if (Y + 1 <= other.Y)
+                        return false;
+                    return true;
+                case Direction.Up:
+                    if (Y - .1 >= other.Y + 1 || Y < other.Y)
+                        return false;
+                    if (X >= other.X + 1)
+                        return false;
+                    if (X + 1 <= other.X)
+                        return false;
+                    return true;
+                case Direction.Down:
+                    if (Y + .1 + 1 <= other.Y || Y > other.Y)
+                        return false;
+                    if (X >= other.X + 1)
+                        return false;
+                    if (X + 1 <= other.X)
+                        return false;
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+
+
 
         #endregion
 
@@ -281,39 +320,51 @@ namespace PsychoTowers
 
 
 
+
+        /// <summary>
+        /// Turns the creep if neccesary
+        /// </summary>
         private void Reface()
         {
+            Direction newFace = Direction.None;
             if (this.DetermineReface())
                 switch (Facing)
                 {
                     case Direction.Right:
-                        lastX++;
+                        LastX++;
                         break;
                     case Direction.Left:
-                        lastX--;
+                        LastX--;
                         break;
                     case Direction.Up:
-                        lastY--;
+                        LastY--;
                         break;
                     case Direction.Down:
-                        lastY++;
+                        LastY++;
                         break;
                     default:
                         break;
                 }
             SnapToGrid();
             if (MyTeam == Team.Team1)
-                Facing = MapData.TeamOnePath[lastX, lastY];
+                newFace = MapData.TeamOnePath[LastX, LastY];
             if (MyTeam == Team.Team2)
-                Facing = MapData.TeamTwoPath[lastX, lastY];
-            currentTile = MapData.TileData[lastX, lastY];
+                newFace = MapData.TeamTwoPath[LastX, LastY];
+            if(Facing != newFace)
+            {
+                Facing = newFace;
+                X = LastX;
+                Y = LastY;
+            }
+            currentTile = MapData.TileData[LastX, LastY];
+            if (DetermineReface())
+                Reface();
         }
 
-
         //Move in a given direction
-        public void Move(Direction direct, float deltaTime)
+        public float Move(Direction direct, float displacement)
         {
-            float displacement = Speed * deltaTime;
+            
 
             for (int i = 0; i < MapData.TeamOne.Count; i++)
             {
@@ -322,13 +373,10 @@ namespace PsychoTowers
                     if (MyTeam != Team.Team1)
                     {
                         Target = MapData.TeamOne[i];
-                        Target.Target = this;
                     }
-                    else
-                    {
-                        SnapToGrid();
-                    }
-                    return;
+                    SnapToGrid();
+                    Nudge(Facing);
+                    return 0;
                 }
             }
             for (int i = 0; i < MapData.TeamTwo.Count; i++)
@@ -338,71 +386,111 @@ namespace PsychoTowers
                     if (MyTeam != Team.Team2)
                     {
                         Target = MapData.TeamTwo[i];
-                        Target.Target = this;
+                    }
+                    Nudge(Facing);
+                    return 0;
+                }
+            }
+            switch (direct)
+            {
+                case Direction.Right:
+                    if (displacement < 1)
+                    {
+                        X += displacement;
+                        return 0;
                     }
                     else
                     {
-                        SnapToGrid();
+                        X++;
+                        return displacement - 1;
                     }
+                case Direction.Left:
+                    if (displacement < 1)
+                    {
+                        X -= displacement;
+                        return 0;
+                    }
+                    else
+                    {
+                        X--;
+                        return displacement - 1;
+                    }
+                case Direction.Up:
+                    if (displacement < 1)
+                    {
+                        Y -= displacement;
+                        return 0;
+                    }
+                    else
+                    {
+                        Y--;
+                        return displacement - 1;
+                    }
+                case Direction.Down:
+                    if (displacement < 1)
+                    {
+                        Y += displacement;
+                        return 0;
+                    }
+                    else
+                    {
+                        Y++;
+                        return displacement - 1;
+                    }
+                default:
+                    Reface();
+                    break;
+            }
+            return 0;
+            
+        }
+
+        public void Nudge(Direction direct)
+        {
+            float displacement = .1f;
+            
+
+            for (int i = 0; i < MapData.TeamOne.Count; i++)
+            {
+                if (CheckCollision(MapData.TeamOne[i], displacement))
+                {
+                    SnapToGrid();
                     return;
                 }
             }
-
-
+            for (int i = 0; i < MapData.TeamTwo.Count; i++)
+            {
+                if (CheckCollision(MapData.TeamTwo[i], displacement))
+                {
+                    SnapToGrid();
+                    return;
+                }
+            }
 
             //Update orientation
             switch (direct)
             {
                 case Direction.Right:
-                    if (lastX + 2 <= MapData.TileData.GetLength(0))
-                        if (MapData.TileData[lastX + 1, lastY].HasFlag(TileProperties.Blocked))
-                        {
-                            X = (int)(X + displacement);
-                            Reface();
-                        }
-                        else
-                            x += displacement;
+                    X += displacement;
                     break;
                 case Direction.Left:
-                    if (lastX >= 1)
-                        if (MapData.TileData[lastX - 1, lastY].HasFlag(TileProperties.Blocked))
-                        {
-                            X = (int)(X - displacement + 1);
-                            Reface();
-                        }
-                        else
-                            x -= displacement;
+                    X -= displacement;
                     break;
                 case Direction.Up:
-                    if (lastY >= 1)
-                        if (MapData.TileData[lastX, lastY - 1].HasFlag(TileProperties.Blocked))
-                        {
-                            Y = (int)(Y - displacement + 1);
-                            Reface();
-                        }
-                        else
-                            Y -= displacement;
+                    Y -= displacement;
                     break;
                 case Direction.Down:
-                    if (lastY + 2 <= MapData.TileData.GetLength(1))
-                        if (MapData.TileData[lastX, lastY + 1].HasFlag(TileProperties.Blocked))
-                        {
-                            Y = (int)(Y + displacement);
-                            Reface();
-                        }
-                        else
-                            Y += displacement;
+                    Y += displacement;
                     break;
                 default:
                     break;
             }
-            
+            SnapToGrid();
+
         }
 
-        
-        
-        
-        
+
+
         //Assault enemy TeamCore
         public void Strike(TeamCore other)
         {
@@ -413,7 +501,9 @@ namespace PsychoTowers
         //Assaults the other Creep dealing damage
         public void Strike(Creep other)
         {
-            other.Health -= (this.Attack - (other.Armor / 2));
+            int damage = (int)((Attack * ((Game1.Rand.NextDouble() * 1000) + 1) - (Armor / 10)));
+            if(damage > 0)
+                other.Health -= damage;
         }
 
         #endregion
