@@ -57,7 +57,7 @@ namespace PsychoTowers
             SpriteManager.BorderTexture = Content.Load<Texture2D>("Square");
             SpriteManager.CreepTexture = Content.Load<Texture2D>("Square");
             SpriteManager.EmptyTowerSlotTexture = Content.Load<Texture2D>("Square");
-            SpriteManager.WallTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.WallTexture = Content.Load<Texture2D>("Mountain");
             SpriteManager.TeamCoreTexture = Content.Load<Texture2D>("Square");
 
 
