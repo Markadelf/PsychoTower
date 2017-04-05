@@ -35,7 +35,7 @@ namespace PsychoTowers
                 if (health > value && Alive)
                 {
                     health = value;
-                    if (Alive)
+                    if (health > 0)
                     {
                         Pulse();
                     }
@@ -78,7 +78,7 @@ namespace PsychoTowers
         //Factory
         public Creep NewCreep()
         {
-            return new Creep(20 + 1 * Level, 1.5f + .01f * Level * Level, 10 * Level * Level, 5 * Level, MapData, MyTeam, X, Y);
+            return new Creep(60 + 10 * Level, 1.5f + .01f * Level * Level, 5 * Level + (10 * Level / 8), 5 * Level - 5, MapData, MyTeam, X, Y);
         }
 
     }

@@ -64,6 +64,9 @@ namespace PsychoTowers
 
         public Creep Target;
 
+        //Timer that handles attacking
+        private float attackTimer;
+
         #endregion
 
         #region Stats
@@ -91,9 +94,9 @@ namespace PsychoTowers
                 if (currentTile.HasFlag(TileProperties.SpeedBuff) && currentTile.HasFlag(TileProperties.SpeedNerf))
                     return speed;
                 if (currentTile.HasFlag(TileProperties.SpeedBuff))
-                    return speed * 3 / 2;
+                    return speed + 1;
                 if (currentTile.HasFlag(TileProperties.SpeedNerf) && speed > 1)
-                    return speed * 2 / 3;
+                    return speed - 1;
                 return speed;
             }
             private set { speed = value; }
@@ -108,9 +111,9 @@ namespace PsychoTowers
                 if (currentTile.HasFlag(TileProperties.AttackBuff) && currentTile.HasFlag(TileProperties.AttackNerf))
                     return attack;
                 if (currentTile.HasFlag(TileProperties.AttackBuff))
-                    return attack * 3 / 2;
+                    return attack + 10;
                 if (currentTile.HasFlag(TileProperties.AttackNerf) && attack > 1)
-                    return attack * 2 / 3;
+                    return attack - 10;
                 return attack;
             }
             private set { attack = value; }
@@ -125,9 +128,9 @@ namespace PsychoTowers
                 if (currentTile.HasFlag(TileProperties.ArmorBuff) && currentTile.HasFlag(TileProperties.ArmorNerf))
                     return armor;
                 if (currentTile.HasFlag(TileProperties.ArmorBuff))
-                    return armor * 3 / 2;
+                    return armor + 10;
                 if (currentTile.HasFlag(TileProperties.ArmorNerf))
-                    return armor * 2 / 3;
+                    return armor - 10;
                 return armor;
             }
             private set { armor = value; }
@@ -157,37 +160,49 @@ namespace PsychoTowers
 
 
 
-        public void Step(float deltaTime, bool heartbeat)
+        public void Step(float deltaTime)
         {
+            currentTile = MapData.TileData[(int) (X + .5f), (int) (Y + .5f)];
+
+            
+
             if (MyTeam == Team.Team1 && CheckCollision(MapData.TeamTwoCore))
                 Strike(MapData.TeamTwoCore);
             if (MyTeam == Team.Team2 && CheckCollision(MapData.TeamOneCore))
                 Strike(MapData.TeamOneCore);
 
-            if (Target == null)
-            {
-                for(float displacement = Speed * deltaTime; displacement > 0; displacement = Move(Facing, displacement))
-                    if (DetermineReface())
-                    {
-                        Reface();
 
-                    }
-            }
-            else
+            for(float displacement = Speed * deltaTime; displacement > 0; displacement = Move(Facing, displacement))
+                if (DetermineReface())
+                {
+                    Reface();
+                }
+
+            
+            if (Target != null)
             {
-                Nudge(Facing);
-                if(heartbeat)
+                if (attackTimer > 0)
+                    attackTimer -= deltaTime;
+                else
                 {
                     Strike(Target);
                     if (!Target.Alive)
                     {
-                        attack += Target.attack / 2;
-                        speed += Target.speed / 3;
-                        armor += Target.armor;
+
+                        attack += Target.attack/10;
+                        speed += Target.speed / 10;
+                        armor += Target.armor / 10;
+                        if (currentTile.HasFlag(TileProperties.DoubleXP))
+                        {
+                            attack += Target.attack / 10;
+                            speed += Target.speed / 10;
+                            armor += Target.armor / 10;
+                        }
                         Target = null;
                         if (Speed > 2075.1f)
                             Speed = 2075.1f;
                     }
+                    attackTimer += .5f;
                 }
                     
             }
@@ -267,7 +282,15 @@ namespace PsychoTowers
             switch (Facing)
             {
                 case Direction.None:
-                    return false;
+                    if (X >= other.X + 1)
+                        return false;
+                    if (X + 1 <= other.X)
+                        return false;
+                    if (Y >= other.Y + 1)
+                        return false;
+                    if (Y + 1 <= other.Y)
+                        return false;
+                    return true;
                 case Direction.Right:
                     if (X + .1 + 1 <= other.X || X > other.X)
                         return false;
@@ -373,9 +396,27 @@ namespace PsychoTowers
                     if (MyTeam != Team.Team1)
                     {
                         Target = MapData.TeamOne[i];
+                        Target.Target = this;
                     }
-                    SnapToGrid();
-                    Nudge(Facing);
+                    switch (Facing)
+                    {
+                        case Direction.None:
+                            break;
+                        case Direction.Right:
+                            X = MapData.TeamOne[i].X - 1;
+                            break;
+                        case Direction.Left:
+                            X = MapData.TeamOne[i].X + 1;
+                            break;
+                        case Direction.Up:
+                            Y = MapData.TeamOne[i].Y + 1;
+                            break;
+                        case Direction.Down:
+                            Y = MapData.TeamOne[i].Y - 1;
+                            break;
+                        default:
+                            break;
+                    }
                     return 0;
                 }
             }
@@ -386,8 +427,27 @@ namespace PsychoTowers
                     if (MyTeam != Team.Team2)
                     {
                         Target = MapData.TeamTwo[i];
+                        Target.Target = this;
                     }
-                    Nudge(Facing);
+                    switch (Facing)
+                    {
+                        case Direction.None:
+                            break;
+                        case Direction.Right:
+                            X = MapData.TeamTwo[i].X - 1;
+                            break;
+                        case Direction.Left:
+                            X = MapData.TeamTwo[i].X + 1;
+                            break;
+                        case Direction.Up:
+                            Y = MapData.TeamTwo[i].Y + 1;
+                            break;
+                        case Direction.Down:
+                            Y = MapData.TeamTwo[i].Y - 1;
+                            break;
+                        default:
+                            break;
+                    }
                     return 0;
                 }
             }
@@ -445,50 +505,7 @@ namespace PsychoTowers
             
         }
 
-        public void Nudge(Direction direct)
-        {
-            float displacement = .1f;
-            
-
-            for (int i = 0; i < MapData.TeamOne.Count; i++)
-            {
-                if (CheckCollision(MapData.TeamOne[i], displacement))
-                {
-                    SnapToGrid();
-                    return;
-                }
-            }
-            for (int i = 0; i < MapData.TeamTwo.Count; i++)
-            {
-                if (CheckCollision(MapData.TeamTwo[i], displacement))
-                {
-                    SnapToGrid();
-                    return;
-                }
-            }
-
-            //Update orientation
-            switch (direct)
-            {
-                case Direction.Right:
-                    X += displacement;
-                    break;
-                case Direction.Left:
-                    X -= displacement;
-                    break;
-                case Direction.Up:
-                    Y -= displacement;
-                    break;
-                case Direction.Down:
-                    Y += displacement;
-                    break;
-                default:
-                    break;
-            }
-            SnapToGrid();
-
-        }
-
+      
 
 
         //Assault enemy TeamCore
@@ -501,9 +518,17 @@ namespace PsychoTowers
         //Assaults the other Creep dealing damage
         public void Strike(Creep other)
         {
-            int damage = (int)((Attack * ((Game1.Rand.NextDouble() * 1000) + 1) - (Armor / 10)));
-            if(damage > 0)
-                other.Health -= damage;
+            int damage = (Attack - (other.Armor));
+            if(damage > 10)
+            {
+                if(Game1.Rand.Next(10) == 0)
+                    other.Health -= 2 * damage;
+                else
+                    other.Health -= damage;
+            }
+            else
+                other.Health -= 10;
+
         }
 
         #endregion

@@ -41,7 +41,9 @@
     <Compile Include="GameObjects\Creep.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="GameObjects\Map.cs" />
+    <Compile Include="GameObjects\Gun.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="GameObjects\Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GameObjects\Tower.cs" />
     <Compile Include="GameObjects\TeamCore.cs" />

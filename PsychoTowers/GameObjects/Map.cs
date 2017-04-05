@@ -43,7 +43,8 @@ namespace PsychoTowers
         public Direction[,] TeamOnePath { get; set; }
         public Direction[,] TeamTwoPath { get; set; }
 
-        public float HeartBeatTimer { get; set; }
+        //Projectiles
+        public List<Projectile> Projectiles { get; set; }
 
 
         //Constructor
@@ -73,7 +74,7 @@ namespace PsychoTowers
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    TowerData[i, j] = null;
+                    TowerData[i, j] = new Tower(TowerType.SpeedUp);
                 }
             }
 
@@ -84,8 +85,9 @@ namespace PsychoTowers
             TeamTwoCore = new TeamCore(19, 9, Team.Team2, this);
             RedefinePaths();
 
-
-            HeartBeatTimer = 0;
+            Projectiles = new List<Projectile>();
+            
+            //ReApplyAuras();
 
 
         }//End Constructor
@@ -93,19 +95,27 @@ namespace PsychoTowers
 
         public void Step(float deltaTime)
         {
-            bool heartbeat;
-            HeartBeatTimer -= deltaTime;
-            if (HeartBeatTimer <= 0)
+            for (int i = 0; i < Projectiles.Count; i++)
             {
-                heartbeat = true;
-                HeartBeatTimer += 2f;
+                Projectiles[i].Step(deltaTime);
+                if (!Projectiles[i].Alive)
+                {
+                    Projectiles.RemoveAt(i);
+                    i--;
+                }
             }
-            else
-                heartbeat = false;
 
-            for(int i = 0; i < TeamOne.Count; i++)
+            for (int i = 0; i < 8; i++)
             {
-                TeamOne[i].Step(deltaTime, heartbeat);
+                for (int j = 0; j < 8; j++)
+                {
+                    TowerData[i, j].Shoot(this, (2 * i + 3), (j * 2 + 2));
+                }
+            }
+
+            for (int i = 0; i < TeamOne.Count; i++)
+            {
+                TeamOne[i].Step(deltaTime);
                 if (!TeamOne[i].Alive)
                 {
                     TeamOne.RemoveAt(i);
@@ -114,7 +124,7 @@ namespace PsychoTowers
             }
             for (int i = 0; i < TeamTwo.Count; i++)
             {
-                TeamTwo[i].Step(deltaTime, heartbeat);
+                TeamTwo[i].Step(deltaTime);
                 if (!TeamTwo[i].Alive)
                 {
                     TeamTwo.RemoveAt(i);
@@ -149,8 +159,8 @@ namespace PsychoTowers
                 if(spawnSafe)
                     TeamTwo.Add(TeamTwoCore.NewCreep());
             }
-            
 
+            ReApplyAuras();
 
 
 
@@ -177,6 +187,7 @@ namespace PsychoTowers
                 return false;
         }
 
+
         public bool PlaceTower(int x, int y, Tower t)
         {
             return false;
@@ -184,7 +195,24 @@ namespace PsychoTowers
 
         public void ReApplyAuras()
         {
+            //Remove auras
+            for(int i = 0; i < TileData.GetLength(0); i++)
+            {
+                for(int j = 0; j < TileData.GetLength(1); j++)
+                {
+                    TileData[i, j] = TileData[i, j] & TileProperties.Blocked;
+                }
+            }
 
+            //Reapply auras
+            for (int i = 0; i < TowerData.GetLength(0); i++)
+            {
+                for (int j = 0; j < TowerData.GetLength(1); j++)
+                {
+                    if (TowerData[i, j] != null)
+                        TowerData[i, j].ApplyAura(this, (2 * i + 3), (j * 2 + 2));
+                }
+            }
         }
 
         #endregion

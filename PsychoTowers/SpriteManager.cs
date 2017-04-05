@@ -16,9 +16,20 @@ namespace PsychoTowers
         public static Texture2D SquareTestTexture { get; set; }
         public static Texture2D BorderTexture { get; set; }
         public static Texture2D WallTexture { get; set; }
-        public static Texture2D CreepTexture { get; set; }
+
+        public static Texture2D CreepUpTexture { get; set; }
+        public static Texture2D CreepDownTexture { get; set; }
+        public static Texture2D CreepRightTexture { get; set; }
+
         public static Texture2D BackgroundTexture { get; set; }
+
         public static Texture2D EmptyTowerSlotTexture { get; set; }
+        public static Texture2D ShootingTowerTexture { get; set; }
+        public static Texture2D BuffTowerTexture { get; set; }
+        public static Texture2D NerfTowerTexture { get; set; }
+        public static Texture2D ExpTowerTexture { get; set; }
+
+
         public static Texture2D TeamCoreTexture { get; set; }
 
         #endregion
@@ -100,7 +111,7 @@ namespace PsychoTowers
                     {
                         if (i < 2 || i > mapdata.TileData.GetLength(0) - 3 || j == 0 || j == mapdata.TileData.GetLength(1) - 1)
                             sb.Draw(BorderTexture, new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale, DrawMapScale, DrawMapScale), Color.Black);
-                        else
+                        else if (!(i / 2 != i / 2.0 && j / 2 == j / 2.0))
                             sb.Draw(WallTexture, new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale, DrawMapScale, DrawMapScale), Color.Gray);
                     }
                 }
@@ -117,6 +128,7 @@ namespace PsychoTowers
                 {
                     if (mapdata.TowerData[i, j] == null)
                         sb.Draw(EmptyTowerSlotTexture, new Rectangle(DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale, DrawMapScale, DrawMapScale), Color.Brown);
+
                 }
             }
 
@@ -129,17 +141,33 @@ namespace PsychoTowers
             //Draw Team Creeps
             for (int i = 0; i < mapdata.TeamOne.Count; i++)
             {
-                sb.Draw(CreepTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamOne[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOne[i].Y * DrawMapScale), DrawMapScale, DrawMapScale), Color.Red);
+                sb.Draw(SquareTestTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamOne[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOne[i].Y * DrawMapScale) 
+                    + DrawMapScale + 2, DrawMapScale, 2), Color.Red);
+                sb.Draw(SquareTestTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamOne[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOne[i].Y * DrawMapScale)
+                    + DrawMapScale + 2, (DrawMapScale * mapdata.TeamOne[i].Health / mapdata.TeamOne[i].MaxHealth), 2), Color.Green);
+                sb.Draw(CreepUpTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamOne[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOne[i].Y * DrawMapScale), DrawMapScale, DrawMapScale), Color.Red);
             }
             for (int i = 0; i < mapdata.TeamTwo.Count; i++)
             {
-                sb.Draw(CreepTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamTwo[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwo[i].Y * DrawMapScale), DrawMapScale, DrawMapScale), Color.Blue);
+                sb.Draw(SquareTestTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamTwo[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwo[i].Y * DrawMapScale)
+                    + DrawMapScale + 2, DrawMapScale, 2), Color.Red);
+                sb.Draw(SquareTestTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamTwo[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwo[i].Y * DrawMapScale)
+                    + DrawMapScale + 2, (DrawMapScale * mapdata.TeamTwo[i].Health / mapdata.TeamTwo[i].MaxHealth), 2), Color.Green);
+                sb.Draw(CreepUpTexture, new Rectangle(DrawMapX + (int)(mapdata.TeamTwo[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwo[i].Y * DrawMapScale), DrawMapScale, DrawMapScale), Color.Blue);
             }
 
-            
 
 
         }//End Draw
+
+
+
+        public static void DrawCreep(SpriteBatch sb, Creep target)
+        {
+
+        }
+
+
 
     }//End Class
 }

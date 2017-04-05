@@ -55,8 +55,17 @@ namespace PsychoTowers
             SpriteManager.SquareTestTexture = Content.Load<Texture2D>("Square");
             SpriteManager.BackgroundTexture = Content.Load<Texture2D>("Square");
             SpriteManager.BorderTexture = Content.Load<Texture2D>("Square");
-            SpriteManager.CreepTexture = Content.Load<Texture2D>("Square");
+
+            SpriteManager.CreepDownTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.CreepRightTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.CreepUpTexture = Content.Load<Texture2D>("Square");
+
             SpriteManager.EmptyTowerSlotTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.BuffTowerTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.NerfTowerTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.ExpTowerTexture = Content.Load<Texture2D>("Square");
+
+
             SpriteManager.WallTexture = Content.Load<Texture2D>("Mountain");
             SpriteManager.TeamCoreTexture = Content.Load<Texture2D>("Square");
 
@@ -99,7 +108,7 @@ namespace PsychoTowers
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend);
             SpriteManager.DrawMap(spriteBatch, active);
             spriteBatch.End();
 
