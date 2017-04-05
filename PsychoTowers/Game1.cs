@@ -41,6 +41,11 @@ namespace PsychoTowers
             // TODO: Add your initialization logic here
             active = new Map();
             Rand = new Random();
+            graphics.PreferredBackBufferWidth = 720;
+            graphics.PreferredBackBufferHeight = 480;
+            //graphics.IsFullScreen = true;
+            graphics.ApplyChanges();
+            
             base.Initialize();
         }
 
@@ -56,18 +61,20 @@ namespace PsychoTowers
             SpriteManager.BackgroundTexture = Content.Load<Texture2D>("Square");
             SpriteManager.BorderTexture = Content.Load<Texture2D>("Square");
 
-            SpriteManager.CreepDownTexture = Content.Load<Texture2D>("Square");
-            SpriteManager.CreepRightTexture = Content.Load<Texture2D>("Square");
-            SpriteManager.CreepUpTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.CreepDownTexture = Content.Load<Texture2D>("CreepRight");
+            SpriteManager.CreepRightTexture = Content.Load<Texture2D>("CreepRight");
+            SpriteManager.CreepLeftTexture = Content.Load<Texture2D>("CreepLeft");
+            SpriteManager.CreepUpTexture = Content.Load<Texture2D>("CreepRight");
 
             SpriteManager.EmptyTowerSlotTexture = Content.Load<Texture2D>("Square");
-            SpriteManager.BuffTowerTexture = Content.Load<Texture2D>("Square");
-            SpriteManager.NerfTowerTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.ShootTowerTexture = Content.Load<Texture2D>("ShootTower");
+            SpriteManager.BuffTowerTexture = Content.Load<Texture2D>("BuffTower");
+            SpriteManager.NerfTowerTexture = Content.Load<Texture2D>("NerfTower");
             SpriteManager.ExpTowerTexture = Content.Load<Texture2D>("Square");
 
 
             SpriteManager.WallTexture = Content.Load<Texture2D>("Mountain");
-            SpriteManager.TeamCoreTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.TeamCoreTexture = Content.Load<Texture2D>("Flag");
 
 
             // TODO: use this.Content to load your game content here
@@ -108,7 +115,8 @@ namespace PsychoTowers
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin(blendState: BlendState.AlphaBlend);
+            spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
+            SpriteManager.Update((float) gameTime.ElapsedGameTime.TotalSeconds);
             SpriteManager.DrawMap(spriteBatch, active);
             spriteBatch.End();
 

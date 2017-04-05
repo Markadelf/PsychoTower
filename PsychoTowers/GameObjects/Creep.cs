@@ -65,7 +65,7 @@ namespace PsychoTowers
         public Creep Target;
 
         //Timer that handles attacking
-        private float attackTimer;
+        public float AttackTimer { get; set; }
 
         #endregion
 
@@ -181,8 +181,8 @@ namespace PsychoTowers
             
             if (Target != null)
             {
-                if (attackTimer > 0)
-                    attackTimer -= deltaTime;
+                if (AttackTimer > 0)
+                    AttackTimer -= deltaTime;
                 else
                 {
                     Strike(Target);
@@ -202,7 +202,7 @@ namespace PsychoTowers
                         if (Speed > 2075.1f)
                             Speed = 2075.1f;
                     }
-                    attackTimer += .5f;
+                    AttackTimer += .5f;
                 }
                     
             }
@@ -396,7 +396,6 @@ namespace PsychoTowers
                     if (MyTeam != Team.Team1)
                     {
                         Target = MapData.TeamOne[i];
-                        Target.Target = this;
                     }
                     switch (Facing)
                     {
@@ -428,7 +427,6 @@ namespace PsychoTowers
                     if (MyTeam != Team.Team2)
                     {
                         Target = MapData.TeamTwo[i];
-                        Target.Target = this;
                     }
                     switch (Facing)
                     {
