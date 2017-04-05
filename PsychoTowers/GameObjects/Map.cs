@@ -74,7 +74,7 @@ namespace PsychoTowers
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    TowerData[i, j] = new Tower(TowerType.Shooter);
+                    TowerData[i, j] = new Tower(TowerType.Shooter + Game1.Rand.Next(8));
                 }
             }
 

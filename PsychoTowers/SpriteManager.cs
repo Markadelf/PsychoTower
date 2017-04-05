@@ -94,7 +94,7 @@ namespace PsychoTowers
         public static void DrawMap(SpriteBatch sb, Map mapdata)
         {
             //Draw background to board
-            sb.Draw(BackgroundTexture, destinationRectangle: new Rectangle(DrawMapX, DrawMapY, DrawMapWidth, DrawMapHeight), layerDepth: 0);
+            sb.Draw(BackgroundTexture, destinationRectangle: new Rectangle(DrawMapX, DrawMapY, DrawMapWidth, DrawMapHeight), layerDepth: 0, color: Color.SandyBrown);
 
 
             //Draw Path

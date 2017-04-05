@@ -39,8 +39,8 @@ namespace PsychoTowers
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            active = new Map();
             Rand = new Random();
+            active = new Map();
             graphics.PreferredBackBufferWidth = 720;
             graphics.PreferredBackBufferHeight = 480;
             //graphics.IsFullScreen = true;
@@ -64,7 +64,7 @@ namespace PsychoTowers
             SpriteManager.CreepDownTexture = Content.Load<Texture2D>("CreepRight");
             SpriteManager.CreepRightTexture = Content.Load<Texture2D>("CreepRight");
             SpriteManager.CreepLeftTexture = Content.Load<Texture2D>("CreepLeft");
-            SpriteManager.CreepUpTexture = Content.Load<Texture2D>("CreepRight");
+            SpriteManager.CreepUpTexture = Content.Load<Texture2D>("CreepLeft");
 
             SpriteManager.EmptyTowerSlotTexture = Content.Load<Texture2D>("Square");
             SpriteManager.ShootTowerTexture = Content.Load<Texture2D>("ShootTower");
