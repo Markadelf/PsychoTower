@@ -417,6 +417,7 @@ namespace PsychoTowers
                         default:
                             break;
                     }
+                    Reface();
                     return 0;
                 }
             }
