@@ -55,7 +55,7 @@ namespace PsychoTowers
             MyTeam = team;
             MapData = mapdata;
             Level = 0;
-            health = 10;
+            health = 3;
             RespawnTimer = 0;
         }
 

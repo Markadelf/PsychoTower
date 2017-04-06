@@ -31,7 +31,7 @@ namespace PsychoTowers
             {
                 if (value >= 0 && value <= MapData.TileData.GetLength(0) - 1)
                 {
-                    x = value;
+                        x = value;
                 }
             }
         }
@@ -44,7 +44,7 @@ namespace PsychoTowers
             {
                 if(value >= 0 && value <= MapData.TileData.GetLength(1) - 1)
                 {
-                    y = value;
+                            y = value;
                 }
             }
         }
@@ -219,13 +219,13 @@ namespace PsychoTowers
             switch (Facing)
             {
                 case Direction.Right:
-                    return (int)X > LastX;
+                    return X >= LastX + 1;
                 case Direction.Left:
-                    return (int)X < LastX - 1;
+                    return X <= LastX - 1;
                 case Direction.Up:
-                    return (int)Y < LastY - 1;
+                    return Y <= LastY - 1;
                 case Direction.Down:
-                    return (int)Y > LastY;
+                    return Y >= LastY + 1;
                 case Direction.None:
                     return false;
             }
@@ -368,7 +368,6 @@ namespace PsychoTowers
                     default:
                         break;
                 }
-            SnapToGrid();
             if (MyTeam == Team.Team1)
                 newFace = MapData.TeamOnePath[LastX, LastY];
             if (MyTeam == Team.Team2)
@@ -384,7 +383,7 @@ namespace PsychoTowers
                 Reface();
         }
 
-        //Move in a given direction
+        //Move in a given direction by a given amount
         public float Move(Direction direct, float displacement)
         {
             
@@ -402,16 +401,20 @@ namespace PsychoTowers
                         case Direction.None:
                             break;
                         case Direction.Right:
-                            X = MapData.TeamOne[i].X - 1;
+                            //if(X < MapData.TeamOne[i].X - 1)
+                                X = MapData.TeamOne[i].X - 1;
                             break;
                         case Direction.Left:
-                            X = MapData.TeamOne[i].X + 1;
+                            //if(X > MapData.TeamOne[i].X + 1)
+                                X = MapData.TeamOne[i].X + 1;
                             break;
                         case Direction.Up:
-                            Y = MapData.TeamOne[i].Y + 1;
+                            //if (Y > MapData.TeamOne[i].Y + 1)
+                                Y = MapData.TeamOne[i].Y + 1;
                             break;
                         case Direction.Down:
-                            Y = MapData.TeamOne[i].Y - 1;
+                            //if(Y < MapData.TeamOne[i].Y - 1)
+                                Y = MapData.TeamOne[i].Y - 1;
                             break;
                         default:
                             break;
@@ -433,16 +436,20 @@ namespace PsychoTowers
                         case Direction.None:
                             break;
                         case Direction.Right:
-                            X = MapData.TeamTwo[i].X - 1;
+                            //if (X < MapData.TeamTwo[i].X - 1)
+                                X = MapData.TeamTwo[i].X - 1;
                             break;
                         case Direction.Left:
-                            X = MapData.TeamTwo[i].X + 1;
+                            //if(X > MapData.TeamTwo[i].X + 1)
+                                X = MapData.TeamTwo[i].X + 1;
                             break;
                         case Direction.Up:
-                            Y = MapData.TeamTwo[i].Y + 1;
+                            //if(Y > MapData.TeamTwo[i].Y + 1)
+                                Y = MapData.TeamTwo[i].Y + 1;
                             break;
                         case Direction.Down:
-                            Y = MapData.TeamTwo[i].Y - 1;
+                            //if(Y < MapData.TeamTwo[i].Y - 1)
+                                Y = MapData.TeamTwo[i].Y - 1;
                             break;
                         default:
                             break;

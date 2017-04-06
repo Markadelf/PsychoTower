@@ -57,7 +57,7 @@ namespace PsychoTowers
                     Weapon = null;
                     break;
                 case TowerType.AttackDown:
-                    Range = 5;
+                    Range = 1;
                     Aura = TileProperties.AttackNerf;
                     Weapon = null;
                     break;
@@ -67,22 +67,22 @@ namespace PsychoTowers
                     Weapon = null;
                     break;
                 case TowerType.DefenseDown:
-                    Range = 5;
+                    Range = 1;
                     Aura = TileProperties.ArmorNerf;
                     Weapon = null;
                     break;
                 case TowerType.SpeedUp:
-                    Range = 3;
+                    Range = 1;
                     Aura = TileProperties.SpeedBuff;
                     Weapon = null;
                     break;
                 case TowerType.SpeedDown:
-                    Range = 7;
+                    Range = 1;
                     Aura = TileProperties.SpeedNerf;
                     Weapon = null;
                     break;
                 case TowerType.ExtraXP:
-                    Range = 4;
+                    Range = 3;
                     Aura = TileProperties.DoubleXP;
                     Weapon = null;
                     break;
