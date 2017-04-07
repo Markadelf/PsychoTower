@@ -29,6 +29,8 @@ namespace PsychoTowers
 
         public Gun Weapon { get; set; }
 
+        public float ShotTimer { get; set; }
+
         /// <summary>
         /// Makes a tower that expells an aura at a range and uses a gun.
         /// </summary>
@@ -40,6 +42,7 @@ namespace PsychoTowers
             Range = range;
             Aura = aura;
             Weapon = gun;
+            ShotTimer = 0;
         }
 
         public Tower(TowerType tower)
@@ -49,42 +52,50 @@ namespace PsychoTowers
                 case TowerType.Shooter:
                     Range = 0;
                     Aura = TileProperties.None;
-                    Weapon = null;
+                    Weapon = new Gun(Team.None, 5, 10);
+                    ShotTimer = 0;
                     break;
                 case TowerType.AttackUp:
                     Range = 1;
                     Aura = TileProperties.AttackBuff;
                     Weapon = null;
+                    ShotTimer = 0;
                     break;
                 case TowerType.AttackDown:
                     Range = 1;
                     Aura = TileProperties.AttackNerf;
                     Weapon = null;
+                    ShotTimer = 0;
                     break;
                 case TowerType.DefenseUp:
                     Range = 1;
                     Aura = TileProperties.ArmorBuff;
                     Weapon = null;
+                    ShotTimer = 0;
                     break;
                 case TowerType.DefenseDown:
                     Range = 1;
                     Aura = TileProperties.ArmorNerf;
                     Weapon = null;
+                    ShotTimer = 0;
                     break;
                 case TowerType.SpeedUp:
                     Range = 1;
                     Aura = TileProperties.SpeedBuff;
                     Weapon = null;
+                    ShotTimer = 0;
                     break;
                 case TowerType.SpeedDown:
                     Range = 1;
                     Aura = TileProperties.SpeedNerf;
                     Weapon = null;
+                    ShotTimer = 0;
                     break;
                 case TowerType.ExtraXP:
                     Range = 3;
                     Aura = TileProperties.DoubleXP;
                     Weapon = null;
+                    ShotTimer = 0;
                     break;
                 default:
                     break;
@@ -114,10 +125,18 @@ namespace PsychoTowers
             }
         }
 
-        public void Shoot(Map mapdata, int x, int y)
+        public void Shoot(Map mapdata, int x, int y, float deltaTime)
         {
             if (Weapon != null)
-                Weapon.Shoot(mapdata, x, y);
+            {
+                ShotTimer -= deltaTime;
+                if(ShotTimer <= 0)
+                {
+                    Weapon.Shoot(mapdata, x, y);
+                    ShotTimer += 1f;
+                }
+
+            }
         }
 
 

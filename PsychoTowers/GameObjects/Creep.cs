@@ -50,8 +50,8 @@ namespace PsychoTowers
         }
 
         //Map it is on and info about it
-        private Map MapData;
-        private TileProperties currentTile;
+        protected Map MapData;
+        protected TileProperties currentTile;
 
         //Which team am I on
         public Team MyTeam { get; set; }
@@ -160,7 +160,7 @@ namespace PsychoTowers
 
 
 
-        public void Step(float deltaTime)
+        public virtual void Step(float deltaTime)
         {
             currentTile = MapData.TileData[(int) (X + .5f), (int) (Y + .5f)];
 
@@ -214,7 +214,7 @@ namespace PsychoTowers
         #region Logic
 
 
-        private bool DetermineReface()
+        protected bool DetermineReface()
         {
             switch (Facing)
             {
@@ -347,7 +347,7 @@ namespace PsychoTowers
         /// <summary>
         /// Turns the creep if neccesary
         /// </summary>
-        private void Reface()
+        protected void Reface()
         {
             Direction newFace = Direction.None;
             if (this.DetermineReface())
@@ -401,19 +401,19 @@ namespace PsychoTowers
                         case Direction.None:
                             break;
                         case Direction.Right:
-                            //if(X < MapData.TeamOne[i].X - 1)
+                            if(Y == MapData.TeamOne[i].Y)
                                 X = MapData.TeamOne[i].X - 1;
                             break;
                         case Direction.Left:
-                            //if(X > MapData.TeamOne[i].X + 1)
+                            if (Y == MapData.TeamOne[i].Y)
                                 X = MapData.TeamOne[i].X + 1;
                             break;
                         case Direction.Up:
-                            //if (Y > MapData.TeamOne[i].Y + 1)
+                            if (X == MapData.TeamOne[i].X)
                                 Y = MapData.TeamOne[i].Y + 1;
                             break;
                         case Direction.Down:
-                            //if(Y < MapData.TeamOne[i].Y - 1)
+                            if (X == MapData.TeamOne[i].X)
                                 Y = MapData.TeamOne[i].Y - 1;
                             break;
                         default:
@@ -436,24 +436,25 @@ namespace PsychoTowers
                         case Direction.None:
                             break;
                         case Direction.Right:
-                            //if (X < MapData.TeamTwo[i].X - 1)
+                            if (Y == MapData.TeamTwo[i].Y)
                                 X = MapData.TeamTwo[i].X - 1;
                             break;
                         case Direction.Left:
-                            //if(X > MapData.TeamTwo[i].X + 1)
+                            if (Y == MapData.TeamTwo[i].Y)
                                 X = MapData.TeamTwo[i].X + 1;
                             break;
                         case Direction.Up:
-                            //if(Y > MapData.TeamTwo[i].Y + 1)
+                            if (X == MapData.TeamTwo[i].X)
                                 Y = MapData.TeamTwo[i].Y + 1;
                             break;
                         case Direction.Down:
-                            //if(Y < MapData.TeamTwo[i].Y - 1)
+                            if (X == MapData.TeamTwo[i].X)
                                 Y = MapData.TeamTwo[i].Y - 1;
                             break;
                         default:
                             break;
                     }
+                    Reface();
                     return 0;
                 }
             }

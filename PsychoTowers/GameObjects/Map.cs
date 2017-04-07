@@ -47,6 +47,8 @@ namespace PsychoTowers
         public List<Projectile> Projectiles { get; set; }
 
 
+
+
         //Constructor
         public Map()
         {
@@ -109,7 +111,7 @@ namespace PsychoTowers
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    TowerData[i, j].Shoot(this, (2 * i + 3), (j * 2 + 2));
+                    TowerData[i, j].Shoot(this, (2 * i + 3), (j * 2 + 2), deltaTime);
                 }
             }
 

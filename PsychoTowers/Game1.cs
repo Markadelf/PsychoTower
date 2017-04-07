@@ -116,7 +116,8 @@ namespace PsychoTowers
             for (int i = 0; i < 100; i++)
                 active.PlaceBlock(Rand.Next(2, active.TileData.GetLength(0) - 2), Rand.Next(1, active.TileData.GetLength(1) - 1));
             //active.PlaceBlock(Rand.Next(3, active.TileData.GetLength(0) - 3), Rand.Next(1, active.TileData.GetLength(1) - 1));
-            for(int i = 0; i < 100 && active.TeamOneCore.Alive && active.TeamTwoCore.Alive; i++)
+            for(int i = 0; i < 10 && active.TeamOneCore.Alive && active.TeamTwoCore.Alive && Keyboard.GetState().IsKeyDown(Keys.LeftShift); i++)
+            active.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
             active.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
 
 

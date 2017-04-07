@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+
 
 namespace PsychoTowers
 {
@@ -23,8 +25,9 @@ namespace PsychoTowers
         public float X { get; set; }
         public float Y { get; set; }
 
-        //Time it will take to hit the target
-        public float TimeToHit { get; set; }
+
+        public float ShotVelocity { get; set; }
+
 
         /// <summary>
         /// Creates a projectile
@@ -32,7 +35,7 @@ namespace PsychoTowers
         /// <param name="x">Start position x</param>
         /// <param name="y">Start position y</param>
         /// <param name="target">Target</param>
-        public Projectile(float x, float y, Creep target)
+        public Projectile(float x, float y, Creep target, int attack)
         {
             Alive = true;
             X = x;
@@ -40,18 +43,15 @@ namespace PsychoTowers
             OriginalY = y;
             Y = y;
             Target = target;
-            TimeToHit = 1;
+            ShotVelocity = 3;
+            Damage = attack;
         }
 
         //Chase bullet every step
         public void Step(float deltaTime)
         {
-            if (!Target.Alive)
-                Alive = false;
-            TimeToHit -= deltaTime;
-            X = TimeToHit * OriginalX + (1 - TimeToHit) * Target.X;
-            Y = TimeToHit * OriginalY + (1 - TimeToHit) * Target.Y;
-            if (TimeToHit == 0)
+            Seek(deltaTime);
+            if (CheckCollision(Target))
             {
                 StrikeTarget();
                 Alive = false;
@@ -79,17 +79,26 @@ namespace PsychoTowers
 
         public bool CheckCollision(Creep other)
         {
-            if (X > other.X + 1)
+            if (X + 5f / 12> other.X + 1)
                 return false;
-            if (other.X > X + .33f)
+            if (other.X > X + 7f / 12)
                 return false;
-            if (Y > other.Y + 1)
+            if (Y + 5f / 12 > other.Y + 1)
                 return false;
-            if (other.Y > Y + .33f)
+            if (other.Y > Y + 7f / 12)
                 return false;
             return true;
         }
 
+        public void Seek(float deltaTime)
+        {
+            Vector2 direction = new Vector2(Target.X - X, Target.Y - Y);
+            direction /= direction.Length();
+            direction *= ShotVelocity;
+            X += direction.X * deltaTime;
+            Y += direction.Y * deltaTime;
+
+        }
 
 
 

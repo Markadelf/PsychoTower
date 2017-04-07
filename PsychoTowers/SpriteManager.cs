@@ -237,6 +237,12 @@ namespace PsychoTowers
                 }
             }
 
+            //Draw Team Creeps
+            for (int i = 0; i < mapdata.Projectiles.Count; i++)
+            {
+                sb.Draw(SquareTestTexture, destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.Projectiles[i].X * DrawMapScale + 10), DrawMapY + (int)(mapdata.Projectiles[i].Y * DrawMapScale + 10), 4, 4), color: Color.Red, layerDepth: 1);
+            }
+
 
         }//End Draw
 

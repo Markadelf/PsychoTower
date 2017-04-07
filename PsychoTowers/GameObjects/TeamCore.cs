@@ -27,6 +27,8 @@ namespace PsychoTowers
 
         public static float RespawnTimer { get; set; }
 
+        public int SpawnsTillRanged { get; set; }
+
         public int Health
         {
             get { return health; }
@@ -56,6 +58,7 @@ namespace PsychoTowers
             MapData = mapdata;
             Level = 0;
             health = 3;
+            SpawnsTillRanged = 4;
             RespawnTimer = 0;
         }
 
@@ -78,6 +81,12 @@ namespace PsychoTowers
         //Factory
         public Creep NewCreep()
         {
+            //if(SpawnsTillRanged <= 0)
+            //{
+            //    SpawnsTillRanged = 4;
+            //    return new RangedCreep(60 + 10 * Level, 1.5f + .01f * Level * Level, 5 * Level + (10 * Level / 8), 5 * Level - 5, MapData, MyTeam, X, Y, 3f + .02f * Level);
+            //}
+            //SpawnsTillRanged--;
             return new Creep(60 + 10 * Level, 1.5f + .01f * Level * Level, 5 * Level + (10 * Level / 8), 5 * Level - 5, MapData, MyTeam, X, Y);
         }
 
