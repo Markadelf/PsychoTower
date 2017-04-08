@@ -235,7 +235,7 @@ namespace PsychoTowers
         {
             if (x < 0 || y < 0 || x >= TileData.GetLength(0) || y >= TileData.GetLength(1))
                 return false;
-            if (x / 2 != x / 2.0 && y / 2 == y / 2.0 && x >= 6 && x <= 17 && y >= 2 && y <= 16)
+            if (x / 2 != x / 2.0 && y / 2 == y / 2.0 && x >= 3 && x <= 17 && y >= 2 && y <= 16)
             {
                 if (TowerData[(x / 2) - 1, (y / 2 ) - 1] == null)
                     return false;
