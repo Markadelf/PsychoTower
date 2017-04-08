@@ -22,7 +22,7 @@ namespace PsychoTowers
 
         private MouseState prev;
 
-        public int tower { get; private set; }
+        public int Tower { get; private set; }
 
         public MouseInput()
         {
@@ -36,32 +36,36 @@ namespace PsychoTowers
             InUse = true;
             InputListener = new Thread(DetectInput);
             InputListener.Start();
-            tower = 0;
+            Tower = 0;
 
             
         }
 
         public void DetectInput()
         {
+            MouseState mouse = Mouse.GetState();
+            X = (mouse.X - SpriteManager.DrawMapX) / 24;
+            Y = (mouse.Y - SpriteManager.DrawMapY) / 24;
+            Thread.Sleep(500);
             while (InUse)
             {
-                MouseState mouse = Mouse.GetState();
+                mouse = Mouse.GetState();
                 X = (mouse.X - SpriteManager.DrawMapX) / 24;
                 Y = (mouse.Y - SpriteManager.DrawMapY) / 24;
                 if (mouse.ScrollWheelValue > prev.ScrollWheelValue)
                 {
-                    tower = (tower + 1) % 8;
+                    Tower = (Tower + 1) % 8;
                 }
                 else if (mouse.ScrollWheelValue < prev.ScrollWheelValue)
                 {
-                    tower = (tower + 7) % 8;
+                    Tower = (Tower + 7) % 8;
                 }
 
                 if (mouse.LeftButton == ButtonState.Pressed && prev.LeftButton == ButtonState.Released)
                 {
                     if (X / 2 != X / 2.0 && Y / 2 == Y / 2.0)
                     {
-                        Act(Command.PlaceTower, tower);
+                        Act(Command.PlaceTower, Tower);
                     }
                     //Is it a wall?
                     else

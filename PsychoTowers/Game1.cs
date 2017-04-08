@@ -29,7 +29,10 @@ namespace PsychoTowers
         public static Random Rand { get; set; }
         public static Player PlayerOne { get; set; }
         public static Player PlayerTwo { get; set; }
-
+        private float incomeTimer;
+        private Menu mainMenu;
+        private Menu pauseMenu;
+        private Menu endMenu;
 
 
         public Game1()
@@ -53,10 +56,13 @@ namespace PsychoTowers
             graphics.PreferredBackBufferHeight = 480;
             //graphics.IsFullScreen = true;
             graphics.ApplyChanges();
-            StartNewGame();
-            PlayerOne = new Player(new MouseInput(), active);
-            IsMouseVisible = true;
+            MyState = GameState.MainMenu;
+            pauseMenu = new Menu(MenuType.PauseMenu, this);
+            mainMenu = new Menu(MenuType.MainMenu, this);
+            endMenu = new Menu(MenuType.GameOverMenu, this);
 
+            IsMouseVisible = true;
+            incomeTimer = 5;
             base.Initialize();
         }
 
@@ -73,7 +79,7 @@ namespace PsychoTowers
             SpriteManager.BacklightTexture = Content.Load<Texture2D>("Backlight");
             SpriteManager.BorderTexture = Content.Load<Texture2D>("Border");
             SpriteManager.PanelTexture = Content.Load<Texture2D>("Panel");
-
+            SpriteManager.ButtonTexture = Content.Load<Texture2D>("ButtonTemplate");
 
             SpriteManager.CreepDownTexture = Content.Load<Texture2D>("CreepRight");
             SpriteManager.CreepRightTexture = Content.Load<Texture2D>("CreepRight");
@@ -89,11 +95,10 @@ namespace PsychoTowers
             SpriteManager.NerfTowerTexture = Content.Load<Texture2D>("NerfTower");
             SpriteManager.ExpTowerTexture = Content.Load<Texture2D>("BuffTower");
 
-
             SpriteManager.WallTexture = Content.Load<Texture2D>("Mountain");
             SpriteManager.TeamCoreTexture = Content.Load<Texture2D>("Flag");
 
-
+            SpriteManager.BasicFont = Content.Load<SpriteFont>("font");
             // TODO: use this.Content to load your game content here
         }
 
@@ -118,12 +123,22 @@ namespace PsychoTowers
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                if (PlayerOne != null && PlayerOne.PlayerInput != null && PlayerOne.PlayerInput.InUse)
+                    PlayerOne.PlayerInput.InputListener.Abort();
+                if (PlayerTwo != null && PlayerTwo.PlayerInput != null && PlayerTwo.PlayerInput.InUse)
+                    PlayerTwo.PlayerInput.InputListener.Abort();
                 Exit();
+            }
             switch (MyState)
             {
                 case GameState.MainMenu:
+                    if(Mouse.GetState().LeftButton == ButtonState.Pressed)
+                        mainMenu.TryClick();
                     break;
                 case GameState.PauseMenu:
+                    if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+                        pauseMenu.TryClick();
                     break;
                 case GameState.GamePlaying:
                     if (!active.TeamOneCore.Alive)
@@ -134,11 +149,23 @@ namespace PsychoTowers
                     {
                         EndGame(Team.Team2);
                     }
-                    for(int i = 0; i < 10 && active.TeamOneCore.Alive && active.TeamTwoCore.Alive && Keyboard.GetState().IsKeyDown(Keys.LeftShift); i++)
-                        active.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
                     active.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
+                    if(incomeTimer <= 0)
+                    {
+                        if (PlayerOne != null)
+                            PlayerOne.Step(20);
+                        if (PlayerTwo != null)
+                            PlayerTwo.Step(20);
+                        incomeTimer = 2.5f;
+                    }
+                    else
+                    {
+                        incomeTimer -= (float) gameTime.ElapsedGameTime.TotalSeconds;
+                    }
                     break;
                 case GameState.GameConclusion:
+                    if(Mouse.GetState().LeftButton == ButtonState.Pressed)
+                        endMenu.TryClick();
                     break;
                 default:
                     break;
@@ -155,6 +182,23 @@ namespace PsychoTowers
         {
             active = new Map();
             MyState = GameState.GamePlaying;
+            if (PlayerOne != null && PlayerOne.PlayerInput != null && PlayerOne.PlayerInput.InUse)
+                PlayerOne.PlayerInput.InputListener.Abort();
+            if (PlayerTwo != null && PlayerTwo.PlayerInput != null && PlayerTwo.PlayerInput.InUse)
+                PlayerTwo.PlayerInput.InputListener.Abort();
+            PlayerOne = new Player(new MouseInput(), active);
+            PlayerTwo = new Player(new GamePadInput(), active);
+        }
+
+        public void PauseGame()
+        {
+            MyState = GameState.PauseMenu;
+
+        }
+
+        public void UnPauseGame()
+        {
+            MyState = GameState.GamePlaying;
         }
 
         public void EndGame(Team winner)
@@ -164,8 +208,9 @@ namespace PsychoTowers
             if (PlayerTwo != null && PlayerTwo.PlayerInput != null)
                 PlayerTwo.PlayerInput.InUse = false;
 
-            MyState = GameState.GameConclusion;
+            MyState = GameState.MainMenu;
         }
+
 
 
 
@@ -178,15 +223,46 @@ namespace PsychoTowers
             GraphicsDevice.Clear(new Color(160, 140, 120));
 
             spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
-            SpriteManager.Update((float) gameTime.ElapsedGameTime.TotalSeconds);
-            SpriteManager.DrawMap(spriteBatch, active);
-            if (PlayerOne != null)
+
+            switch (MyState)
             {
-                SpriteManager.DrawSidePannel(spriteBatch, PlayerOne);
-                if (PlayerOne.PlayerInput != null && PlayerOne.PlayerInput.InUse)
-                    SpriteManager.DrawCursor(spriteBatch, PlayerOne.PlayerInput);
+                case GameState.MainMenu:
+                    SpriteManager.DrawMenu(spriteBatch, mainMenu);
+                    break;
+                case GameState.PauseMenu:
+                    SpriteManager.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+                    SpriteManager.DrawMap(spriteBatch, active);
+                    if (PlayerOne != null)
+                    {
+                        SpriteManager.DrawSidePannel(spriteBatch, PlayerOne, PlayerTwo);
+                        if (PlayerOne.PlayerInput != null && PlayerOne.PlayerInput.InUse)
+                            SpriteManager.DrawCursor(spriteBatch, PlayerOne.PlayerInput, Color.Red);
+                        if (PlayerTwo.PlayerInput != null && PlayerTwo.PlayerInput.InUse)
+                            SpriteManager.DrawCursor(spriteBatch, PlayerTwo.PlayerInput, Color.Blue);
+                    }
+                    SpriteManager.DrawMenu(spriteBatch, pauseMenu);
+                    break;
+                case GameState.GamePlaying:
+                    SpriteManager.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+                    SpriteManager.DrawMap(spriteBatch, active);
+                    if (PlayerOne != null)
+                    {
+                        SpriteManager.DrawSidePannel(spriteBatch, PlayerOne, PlayerTwo);
+                        if (PlayerOne.PlayerInput != null && PlayerOne.PlayerInput.InUse)
+                            SpriteManager.DrawCursor(spriteBatch, PlayerOne.PlayerInput, Color.Red);
+                        if (PlayerTwo.PlayerInput != null && PlayerTwo.PlayerInput.InUse)
+                            SpriteManager.DrawCursor(spriteBatch, PlayerTwo.PlayerInput, Color.Blue);
+                    }
+                    break;
+                case GameState.GameConclusion:
+                    SpriteManager.DrawMenu(spriteBatch, endMenu);
+                    break;
+                default:
+                    break;
             }
+            
             spriteBatch.End();
+
             base.Draw(gameTime);
         }
     }

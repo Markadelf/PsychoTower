@@ -28,7 +28,7 @@ namespace PsychoTowers
         public static Texture2D BackgroundTexture { get; set; }
         public static Texture2D BacklightTexture { get; set; }
         public static Texture2D PanelTexture { get; set; }
-
+        public static Texture2D ButtonTexture { get; set; }
 
         public static Texture2D EmptyTowerSlotTexture { get; set; }
         public static Texture2D ShootTowerTexture { get; set; }
@@ -39,6 +39,8 @@ namespace PsychoTowers
 
         public static Texture2D TeamCoreTexture { get; set; }
 
+
+        public static SpriteFont BasicFont { get; set; }
 
         #endregion
 
@@ -79,7 +81,7 @@ namespace PsychoTowers
         public const int DrawMapScale = 24;
 
         public const int DrawPanelX = 528;
-        public const int DrawPanelWidth = 7 * 24;
+        public const int DrawPanelWidth = 15 * 12;
         public const int DrawPanelY = 12;
         public const int DrawPanelHeight = 19 * 24;
 
@@ -176,7 +178,18 @@ namespace PsychoTowers
                     sb.Draw(TeamCoreTexture, sourceRectangle: new Rectangle(0, 0, 24, 24), destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamTwoCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwoCore.Y * DrawMapScale) + 4,
                         DrawMapScale, DrawMapScale), color: Color.Blue, layerDepth: (mapdata.TeamTwoCore.Y / 100f));
                 }
-
+                sb.Draw(SquareTestTexture,
+                        destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamOneCore.X * DrawMapScale) + (DrawMapScale * mapdata.TeamOneCore.Health / 3), DrawMapY + 
+                        (int)(mapdata.TeamOneCore.Y * DrawMapScale)
+                       + DrawMapScale + 2, DrawMapScale - (DrawMapScale * mapdata.TeamOneCore.Health / 3), 2), color: Color.Red, layerDepth: 1);
+                sb.Draw(SquareTestTexture, destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamOneCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOneCore.Y * DrawMapScale)
+                    + DrawMapScale + 2, (DrawMapScale * mapdata.TeamOneCore.Health / 3), 2), color: Color.Green, layerDepth: 1);
+                sb.Draw(SquareTestTexture,
+                        destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamTwoCore.X * DrawMapScale) + (DrawMapScale * mapdata.TeamTwoCore.Health / 3), DrawMapY +
+                        (int)(mapdata.TeamTwoCore.Y * DrawMapScale)
+                       + DrawMapScale + 2, DrawMapScale - (DrawMapScale * mapdata.TeamTwoCore.Health / 3), 2), color: Color.Red, layerDepth: 1);
+                sb.Draw(SquareTestTexture, destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamTwoCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwoCore.Y * DrawMapScale)
+                    + DrawMapScale + 2, (DrawMapScale * mapdata.TeamTwoCore.Health / 3), 2), color: Color.Green, layerDepth: 1);
 
 
                 //Draw Team Creeps
@@ -227,10 +240,22 @@ namespace PsychoTowers
         public static void DrawSidePannel(SpriteBatch sb, Player player)
         {
             sb.Draw(PanelTexture, destinationRectangle: new Rectangle(DrawPanelX, DrawPanelY, DrawPanelWidth, DrawPanelHeight), layerDepth: .991f, color: Color.SandyBrown);
+            sb.DrawString(BasicFont, "Player One", new Vector2(DrawPanelX + 12, DrawPanelY + 8), Color.Black, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, layerDepth: .993f);
+            sb.DrawString(BasicFont, "Gold: " + player.Gold, new Vector2(DrawPanelX + 12, DrawPanelY + 24), Color.Black, 0f, new Vector2(0,0), 1f, SpriteEffects.None, layerDepth: .993f);
+            sb.DrawString(BasicFont, "Tower: " + (TowerType)player.PlayerInput.Tower, new Vector2(DrawPanelX + 12, DrawPanelY + 40), Color.Black, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, layerDepth: .993f);
+
         }
 
         public static void DrawSidePannel(SpriteBatch sb, Player playerOne, Player playerTwo)
         {
+            sb.DrawString(BasicFont, "Player One", new Vector2(DrawPanelX + 12, DrawPanelY + 8), Color.Black, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, layerDepth: .993f);
+            sb.DrawString(BasicFont, "Gold: " + playerOne.Gold, new Vector2(DrawPanelX + 12, DrawPanelY + 24), Color.Black, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, layerDepth: .993f);
+            sb.DrawString(BasicFont, "Tower: " + (TowerType)playerOne.PlayerInput.Tower, new Vector2(DrawPanelX + 12, DrawPanelY + 40), Color.Black, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, layerDepth: .993f);
+
+            sb.Draw(PanelTexture, destinationRectangle: new Rectangle(DrawPanelX, DrawPanelY, DrawPanelWidth, DrawPanelHeight), layerDepth: .991f, color: Color.SandyBrown);
+            sb.DrawString(BasicFont, "Player Two", new Vector2(DrawPanelX + 12, DrawPanelY + DrawPanelHeight / 2), Color.Black, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, layerDepth: .993f);
+            sb.DrawString(BasicFont, "Gold: " + playerTwo.Gold, new Vector2(DrawPanelX + 12, DrawPanelY + 16 + DrawPanelHeight / 2), Color.Black, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, layerDepth: .993f);
+            sb.DrawString(BasicFont, "Tower: " + (TowerType)playerTwo.PlayerInput.Tower, new Vector2(DrawPanelX + 12, DrawPanelY + 32 + DrawPanelHeight / 2), Color.Black, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, layerDepth: .993f);
 
         }
 
@@ -268,15 +293,24 @@ namespace PsychoTowers
                     break;
                 default:
                     sb.Draw(ShootTowerTexture, destinationRectangle:
-                        new Rectangle(x, y, width, height), color: Color.Orchid, layerDepth: depth);
+                        new Rectangle(x, y, width, height), color: Color.Purple, layerDepth: depth);
                     break;
             }
         }
 
-        public static void DrawCursor(SpriteBatch sb, InputMethod cursor)
+        public static void DrawCursor(SpriteBatch sb, InputMethod cursor, Color col)
         {
             sb.Draw(AuraTexture, destinationRectangle:
-                        new Rectangle(DrawMapX + (int)(cursor.X * DrawMapScale), DrawMapY + (int)(cursor.Y * DrawMapScale), DrawMapScale, DrawMapScale), color: new Color(Color.Yellow, .25f), layerDepth: 1f);
+                        new Rectangle(DrawMapX + (int)(cursor.X * DrawMapScale), DrawMapY + (int)(cursor.Y * DrawMapScale), DrawMapScale, DrawMapScale), color: new Color(col, .25f), layerDepth: .98f);
+        }
+
+        public static void DrawMenu(SpriteBatch sb, Menu menu)
+        {
+            for(int i = 0; i < menu.Panels.Count; i++)
+            {
+                sb.Draw(ButtonTexture, new Rectangle(menu.Panels[i].X, menu.Panels[i].Y, menu.Panels[i].Width, menu.Panels[i].Height), Color.White);
+                sb.DrawString(BasicFont, menu.Panels[i].MyText, new Vector2(menu.Panels[i].X + 12, menu.Panels[i].Y + menu.Panels[i].Height / 2 - 16), Color.Black, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, layerDepth: 1);
+            }
         }
 
         //Method that draws one creep

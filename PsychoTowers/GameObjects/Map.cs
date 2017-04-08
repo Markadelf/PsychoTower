@@ -365,20 +365,6 @@ namespace PsychoTowers
         //A recursive function that finds the shortest path from to any given square
         private void RecursePath(Direction[,] path, int[,] count, int x, int y)
         {
-            //Check Left
-            if(count[x,y] + 1 < count[x - 1, y] && !TileData[x - 1, y].HasFlag(TileProperties.Blocked))
-            {
-                path[x - 1, y] = Direction.Right;
-                count[x - 1, y] = count[x, y] + 1;
-                RecursePath(path, count, x - 1, y);
-            }
-            //Check Right
-            if (count[x, y] + 1 < count[x + 1, y] && !TileData[x + 1, y].HasFlag(TileProperties.Blocked))
-            {
-                path[x + 1, y] = Direction.Left;
-                count[x + 1, y] = count[x, y] + 1;
-                RecursePath(path, count, x + 1, y);
-            }
             //Check Up
             if (count[x, y] + 1 < count[x , y - 1] && !TileData[x, y - 1].HasFlag(TileProperties.Blocked))
             {
@@ -393,6 +379,21 @@ namespace PsychoTowers
                 count[x, y + 1] = count[x, y] + 1;
                 RecursePath(path, count, x, y + 1);
             }
+            //Check Left
+            if(count[x,y] + 1 < count[x - 1, y] && !TileData[x - 1, y].HasFlag(TileProperties.Blocked))
+            {
+                path[x - 1, y] = Direction.Right;
+                count[x - 1, y] = count[x, y] + 1;
+                RecursePath(path, count, x - 1, y);
+            }
+            //Check Right
+            if (count[x, y] + 1 < count[x + 1, y] && !TileData[x + 1, y].HasFlag(TileProperties.Blocked))
+            {
+                path[x + 1, y] = Direction.Left;
+                count[x + 1, y] = count[x, y] + 1;
+                RecursePath(path, count, x + 1, y);
+            }
+            
         }
 
         private void EnsureHomoginity()

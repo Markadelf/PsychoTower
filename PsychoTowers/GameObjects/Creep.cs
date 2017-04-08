@@ -329,53 +329,17 @@ namespace PsychoTowers
         }
         public bool CheckCollision(int x, int y)
         {
-            switch (Facing)
-            {
-                case Direction.None:
-                    if (X >= x + 1)
-                        return false;
-                    if (X + 1 <= x)
-                        return false;
-                    if (Y >= y + 1)
-                        return false;
-                    if (Y + 1 <= y)
-                        return false;
-                    return true;
-                case Direction.Right:
-                    if (X + .1 + 1 <= x || X > x)
-                        return false;
-                    if (Y >= y + 1)
-                        return false;
-                    if (Y + 1 <= y)
-                        return false;
-                    return true;
-                case Direction.Left:
-                    if (X - .1 >= x + 1 || X < x)
-                        return false;
-                    if (Y >= y + 1)
-                        return false;
-                    if (Y + 1 <= y)
-                        return false;
-                    return true;
-                case Direction.Up:
-                    if (Y - .1 >= y + 1 || Y < y)
-                        return false;
-                    if (X >= x + 1)
-                        return false;
-                    if (X + 1 <= x)
-                        return false;
-                    return true;
-                case Direction.Down:
-                    if (Y + .1 + 1 <= y || Y > y)
-                        return false;
-                    if (X >= x + 1)
-                        return false;
-                    if (X + 1 <= x)
-                        return false;
-                    return true;
-                default:
-                    return false;
-            }
+
+            if (X >= x + 1)
+                return false;
+            if (X + 1 <= x)
+                return false;
+            if (Y >= y + 1)
+                return false;
+            if (Y + 1 <= y)
+                return false;
+            return true;
+               
         }
 
 

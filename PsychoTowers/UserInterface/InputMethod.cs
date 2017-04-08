@@ -23,6 +23,8 @@ namespace PsychoTowers
         int X { get; }
         int Y { get; }
 
+
+        int Tower { get; }
         bool InUse { get; set; }
         Thread InputListener { get; }
 
