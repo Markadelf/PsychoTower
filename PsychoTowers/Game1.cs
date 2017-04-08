@@ -9,7 +9,10 @@ namespace PsychoTowers
 
     public enum GameState
     {
-
+        MainMenu,       //Main menu, allows you to start games
+        PauseMenu,      //Pause Menu pauses the game mid play
+        GamePlaying,    //Game is currently playing
+        GameConclusion  //Game has just ended, declare a victor
     }
 
 
@@ -22,9 +25,12 @@ namespace PsychoTowers
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Map active;
+        public GameState MyState { get; set; }
         public static Random Rand { get; set; }
-        int oneScore;
-        int twoScore;
+        public static Player PlayerOne { get; set; }
+        public static Player PlayerTwo { get; set; }
+
+
 
         public Game1()
         {
@@ -47,8 +53,9 @@ namespace PsychoTowers
             graphics.PreferredBackBufferHeight = 480;
             //graphics.IsFullScreen = true;
             graphics.ApplyChanges();
-            oneScore = 0;
-            twoScore = 0;
+            StartNewGame();
+            PlayerOne = new Player(new MouseInput(), active);
+            IsMouseVisible = true;
 
             base.Initialize();
         }
@@ -62,19 +69,23 @@ namespace PsychoTowers
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             SpriteManager.SquareTestTexture = Content.Load<Texture2D>("Square");
-            SpriteManager.BackgroundTexture = Content.Load<Texture2D>("Square");
-            SpriteManager.BorderTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.BackgroundTexture = Content.Load<Texture2D>("Background");
+            SpriteManager.BacklightTexture = Content.Load<Texture2D>("Backlight");
+            SpriteManager.BorderTexture = Content.Load<Texture2D>("Border");
 
             SpriteManager.CreepDownTexture = Content.Load<Texture2D>("CreepRight");
             SpriteManager.CreepRightTexture = Content.Load<Texture2D>("CreepRight");
             SpriteManager.CreepLeftTexture = Content.Load<Texture2D>("CreepLeft");
             SpriteManager.CreepUpTexture = Content.Load<Texture2D>("CreepLeft");
 
-            SpriteManager.EmptyTowerSlotTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.AuraTexture = Content.Load<Texture2D>("Aura");
+            SpriteManager.RangeTexture = Content.Load<Texture2D>("AimCircle");
+
+            SpriteManager.EmptyTowerSlotTexture = Content.Load<Texture2D>("TowerSlot");
             SpriteManager.ShootTowerTexture = Content.Load<Texture2D>("ShootTower");
             SpriteManager.BuffTowerTexture = Content.Load<Texture2D>("BuffTower");
             SpriteManager.NerfTowerTexture = Content.Load<Texture2D>("NerfTower");
-            SpriteManager.ExpTowerTexture = Content.Load<Texture2D>("Square");
+            SpriteManager.ExpTowerTexture = Content.Load<Texture2D>("BuffTower");
 
 
             SpriteManager.WallTexture = Content.Load<Texture2D>("Mountain");
@@ -90,7 +101,11 @@ namespace PsychoTowers
         /// </summary>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
+            if (PlayerOne != null && PlayerOne.PlayerInput != null && PlayerOne.PlayerInput.InUse)
+                 PlayerOne.PlayerInput.InputListener.Abort();
+            if (PlayerTwo != null && PlayerTwo.PlayerInput != null && PlayerTwo.PlayerInput.InUse)
+                PlayerTwo.PlayerInput.InputListener.Abort();
+
         }
 
         /// <summary>
@@ -102,27 +117,55 @@ namespace PsychoTowers
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-            if (!active.TeamOneCore.Alive)
+            switch (MyState)
             {
-                twoScore++;
-                active = new Map();
+                case GameState.MainMenu:
+                    break;
+                case GameState.PauseMenu:
+                    break;
+                case GameState.GamePlaying:
+                    if (!active.TeamOneCore.Alive)
+                    {
+                        EndGame(Team.Team1);
+                    }
+                    if (!active.TeamTwoCore.Alive)
+                    {
+                        EndGame(Team.Team2);
+                    }
+                    for(int i = 0; i < 10 && active.TeamOneCore.Alive && active.TeamTwoCore.Alive && Keyboard.GetState().IsKeyDown(Keys.LeftShift); i++)
+                        active.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
+                    active.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
+                    break;
+                case GameState.GameConclusion:
+                    break;
+                default:
+                    break;
             }
-            if (!active.TeamTwoCore.Alive)
-            {
-                oneScore++;
-                active = new Map();
-            }
-            for (int i = 0; i < 100; i++)
-                active.PlaceBlock(Rand.Next(2, active.TileData.GetLength(0) - 2), Rand.Next(1, active.TileData.GetLength(1) - 1));
-            //active.PlaceBlock(Rand.Next(3, active.TileData.GetLength(0) - 3), Rand.Next(1, active.TileData.GetLength(1) - 1));
-            for(int i = 0; i < 10 && active.TeamOneCore.Alive && active.TeamTwoCore.Alive && Keyboard.GetState().IsKeyDown(Keys.LeftShift); i++)
-            active.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
-            active.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
+            
 
 
             base.Update(gameTime);
         }
+
+
+
+        public void StartNewGame()
+        {
+            active = new Map();
+            MyState = GameState.GamePlaying;
+        }
+
+        public void EndGame(Team winner)
+        {
+            if (PlayerOne != null && PlayerOne.PlayerInput != null)
+                PlayerOne.PlayerInput.InUse = false;
+            if (PlayerTwo != null && PlayerTwo.PlayerInput != null)
+                PlayerTwo.PlayerInput.InUse = false;
+
+            MyState = GameState.GameConclusion;
+        }
+
+
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -130,7 +173,7 @@ namespace PsychoTowers
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(new Color(160, 140, 120));
 
             spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
             SpriteManager.Update((float) gameTime.ElapsedGameTime.TotalSeconds);

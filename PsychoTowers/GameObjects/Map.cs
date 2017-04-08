@@ -76,7 +76,7 @@ namespace PsychoTowers
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    TowerData[i, j] = new Tower(TowerType.Shooter + Game1.Rand.Next(8));
+                    TowerData[i, j] = null;
                 }
             }
 
@@ -86,7 +86,6 @@ namespace PsychoTowers
             TeamOneCore = new TeamCore(1, 9, Team.Team1, this);
             TeamTwoCore = new TeamCore(19, 9, Team.Team2, this);
             RedefinePaths();
-
             Projectiles = new List<Projectile>();
             
             //ReApplyAuras();
@@ -111,7 +110,8 @@ namespace PsychoTowers
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    TowerData[i, j].Shoot(this, (2 * i + 3), (j * 2 + 2), deltaTime);
+                    if (TowerData[i, j] != null)
+                        TowerData[i, j].Shoot(this, (2 * i + 3), (j * 2 + 2), deltaTime);
                 }
             }
 
@@ -178,8 +178,20 @@ namespace PsychoTowers
 
         public bool PlaceBlock(int x, int y)
         {
+            if (x < 0 || y < 0 || x >= TileData.GetLength(0) || y >= TileData.GetLength(1))
+                return false;
             if (TileData[x, y].HasFlag(TileProperties.Blocked) || (x == TeamOneCore.X && y == TeamOneCore.Y) || (x == TeamTwoCore.X && y == TeamTwoCore.Y))
                 return false;
+            for (int i = 0; i < TeamOne.Count; i++)
+            {
+                if (TeamOne[i].CheckCollision(x,y))
+                    return false;
+            }
+            for (int i = 0; i < TeamTwo.Count; i++)
+            {
+                if (TeamTwo[i].CheckCollision(x, y))
+                    return false;
+            }
 
             if (TryBlock(x, y))
             {
@@ -189,10 +201,53 @@ namespace PsychoTowers
                 return false;
         }
 
+        public bool RemoveBlock(int x, int y)
+        {
+            if (!TileData[x, y].HasFlag(TileProperties.Blocked))
+                return false;
+            else
+            {
+                TileData[x, y] -= TileProperties.Blocked;
+                RedefinePaths();
+                return true;
+            }
+
+        }
 
         public bool PlaceTower(int x, int y, Tower t)
         {
+            if (x < 0 || y < 0 || x >= TileData.GetLength(0) || y >= TileData.GetLength(1))
+                return false;
+            if (x / 2 != x / 2.0 && y / 2 == y / 2.0 && x >= 6 && x <= 17 && y >= 2 && y <= 16)
+            {
+                if (TowerData[(x / 2) - 1, (y / 2) - 1] != null)
+                    return false;
+                else
+                {
+                    TowerData[(x / 2) - 1, (y / 2) - 1] = t;
+                    return true;
+                }
+            }
             return false;
+        }
+
+        public bool RemoveTower(int x, int y)
+        {
+            if (x < 0 || y < 0 || x >= TileData.GetLength(0) || y >= TileData.GetLength(1))
+                return false;
+            if (x / 2 != x / 2.0 && y / 2 == y / 2.0 && x >= 6 && x <= 17 && y >= 2 && y <= 16)
+            {
+                if (TowerData[(x / 2) - 1, (y / 2 ) - 1] == null)
+                    return false;
+                else
+                {
+                    TowerData[(x / 2) - 1, (y / 2) - 1] = null;
+                    return true;
+                }
+            }
+                return false;
+            
+
         }
 
         public void ReApplyAuras()

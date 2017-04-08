@@ -42,12 +42,15 @@
     <Compile Include="Game1.cs" />
     <Compile Include="GameObjects\Map.cs" />
     <Compile Include="GameObjects\Gun.cs" />
+    <Compile Include="MouseInput.cs" />
+    <Compile Include="UserInterface\InputMethod.cs" />
+    <Compile Include="UserInterface\Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="GameObjects\Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GameObjects\Tower.cs" />
     <Compile Include="GameObjects\TeamCore.cs" />
-    <Compile Include="RangedCreep.cs" />
+    <Compile Include="GameObjects\RangedCreep.cs" />
     <Compile Include="SpriteManager.cs" />
   </ItemGroup>
   <ItemGroup>

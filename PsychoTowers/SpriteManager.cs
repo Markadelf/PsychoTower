@@ -22,8 +22,11 @@ namespace PsychoTowers
         public static Texture2D CreepRightTexture { get; set; }
         public static Texture2D CreepLeftTexture { get; set; }
 
+        public static Texture2D AuraTexture { get; set; }
+        public static Texture2D RangeTexture { get; set; }
 
         public static Texture2D BackgroundTexture { get; set; }
+        public static Texture2D BacklightTexture { get; set; }
 
         public static Texture2D EmptyTowerSlotTexture { get; set; }
         public static Texture2D ShootTowerTexture { get; set; }
@@ -61,22 +64,22 @@ namespace PsychoTowers
         }
         private SpriteManager()
         {
-            DrawMapScale = 24;
-            DrawMapX = 12;
-            DrawMapWidth = 21 * DrawMapScale;
-            DrawMapY = 12;
-            DrawMapHeight = 19 * DrawMapScale;
             FlagTimer = 0;
             CreepTimer = 0;
         }
         #endregion
 
         //Info for drawing game screen
-        public static int DrawMapX { get; set; }
-        public static int DrawMapWidth { get; set; }
-        public static int DrawMapY { get; set; }
-        public static int DrawMapHeight { get; set; }
-        public static int DrawMapScale { get; set; }
+        public const int DrawMapX  = 12;
+        public const int DrawMapWidth  = 21 * 24;
+        public const int DrawMapY  = 12;
+        public const int DrawMapHeight  = 19 * 24;
+        public const int DrawMapScale = 24;
+
+        public const int DrawPanelX = 516;
+        public const int DrawPanelWidth = 21 * DrawMapScale;
+        public const int DrawPanelY = 12;
+        public const int DrawPanelHeight = 19 * 24;
 
         public static void Update(float deltaTime)
         {
@@ -95,6 +98,8 @@ namespace PsychoTowers
         {
             //Draw background to board
             sb.Draw(BackgroundTexture, destinationRectangle: new Rectangle(DrawMapX, DrawMapY, DrawMapWidth, DrawMapHeight), layerDepth: 0, color: Color.SandyBrown);
+            sb.Draw(BorderTexture, destinationRectangle: new Rectangle(DrawMapX, DrawMapY, DrawMapWidth, DrawMapHeight), layerDepth: 1, color: Color.SandyBrown);
+            sb.Draw(BacklightTexture, destinationRectangle: new Rectangle(0, 0, 720, 480), layerDepth: .99f, color: new Color(160, 140, 120));
 
 
             //Draw Path
@@ -198,42 +203,10 @@ namespace PsychoTowers
                 for (int j = 0; j < mapdata.TowerData.GetLength(1); j++)
                 {
                     if (mapdata.TowerData[i, j] == null)
-                        sb.Draw(EmptyTowerSlotTexture, destinationRectangle: 
+                        sb.Draw(EmptyTowerSlotTexture, destinationRectangle:
                             new Rectangle(DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale, DrawMapScale, DrawMapScale), color: Color.Brown, layerDepth: (j * 2 + 2) / 100f);
                     else
-                        switch (mapdata.TowerData[i, j].Aura)
-                        {
-                            case TileProperties.AttackBuff:
-                                sb.Draw(BuffTowerTexture, destinationRectangle: 
-                                    new Rectangle(DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale - 8, DrawMapScale, DrawMapScale + 8), color: Color.Crimson, layerDepth: (j * 2 + 2)/100f);
-                                break;
-                            case TileProperties.AttackNerf:
-                                sb.Draw(NerfTowerTexture, destinationRectangle: 
-                                    new Rectangle(DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale - 8, DrawMapScale, DrawMapScale + 8), color: Color.LightCoral, layerDepth: (j * 2 + 2) / 100f);
-                                break;
-                            case TileProperties.ArmorBuff:
-                                sb.Draw(BuffTowerTexture, destinationRectangle: 
-                                    new Rectangle(DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale - 8, DrawMapScale, DrawMapScale + 8), color: Color.RoyalBlue, layerDepth: (j * 2 + 2) / 100f);
-                                break;
-                            case TileProperties.ArmorNerf:
-                                sb.Draw(NerfTowerTexture, destinationRectangle: 
-                                    new Rectangle(DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale - 8, DrawMapScale, DrawMapScale + 8), color: Color.DeepSkyBlue, layerDepth: (j * 2 + 2) / 100f);
-                                break;
-                            case TileProperties.SpeedBuff:
-                                sb.Draw(BuffTowerTexture, destinationRectangle: 
-                                    new Rectangle(DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale - 8, DrawMapScale, DrawMapScale + 8), color: Color.SpringGreen, layerDepth: (j * 2 + 2) / 100f);
-                                break;
-                            case TileProperties.SpeedNerf:
-                                sb.Draw(NerfTowerTexture, destinationRectangle: 
-                                    new Rectangle(DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale - 8, DrawMapScale, DrawMapScale + 8), color: Color.YellowGreen, layerDepth: (j * 2 + 2) / 100f);
-                                break;
-                            case TileProperties.DoubleXP:
-                                break;
-                            default:
-                                sb.Draw(ShootTowerTexture, destinationRectangle:
-                                   new Rectangle(DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale - 8, DrawMapScale, DrawMapScale + 8), color: Color.Orchid, layerDepth: (j * 2 + 2) / 100f);
-                                break;
-                        }
+                        DrawTower(sb, mapdata.TowerData[i, j].Aura, DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale - 8, DrawMapScale, DrawMapScale + 8);
                 }
             }
 
@@ -247,6 +220,54 @@ namespace PsychoTowers
         }//End Draw
 
 
+        public static void DrawSidePannel(SpriteBatch sb, Player player)
+        {
+
+        }
+
+        public static void DrawSidePannel(SpriteBatch sb, Player playerOne, Player playerTwo)
+        {
+
+        }
+
+        public static void DrawTower(SpriteBatch sb, TileProperties type, int x, int y, int width, int height)
+        {
+            switch (type)
+            {
+                case TileProperties.AttackBuff:
+                    sb.Draw(BuffTowerTexture, destinationRectangle:
+                        new Rectangle(x, y, width, height), color: Color.Crimson, layerDepth: (y) / 100f);
+                    break;
+                case TileProperties.AttackNerf:
+                    sb.Draw(NerfTowerTexture, destinationRectangle:
+                        new Rectangle(x, y, width, height), color: Color.LightCoral, layerDepth: (y) / 100f);
+                    break;
+                case TileProperties.ArmorBuff:
+                    sb.Draw(BuffTowerTexture, destinationRectangle:
+                        new Rectangle(x, y, width, height), color: Color.RoyalBlue, layerDepth: (y) / 100f);
+                    break;
+                case TileProperties.ArmorNerf:
+                    sb.Draw(NerfTowerTexture, destinationRectangle:
+                        new Rectangle(x, y, width, height), color: Color.DeepSkyBlue, layerDepth: (y) / 100f);
+                    break;
+                case TileProperties.SpeedBuff:
+                    sb.Draw(BuffTowerTexture, destinationRectangle:
+                        new Rectangle(x, y, width, height), color: Color.SpringGreen, layerDepth: (y) / 100f);
+                    break;
+                case TileProperties.SpeedNerf:
+                    sb.Draw(NerfTowerTexture, destinationRectangle:
+                        new Rectangle(x, y, width, height), color: Color.YellowGreen, layerDepth: (y) / 100f);
+                    break;
+                case TileProperties.DoubleXP:
+                    sb.Draw(ExpTowerTexture, destinationRectangle:
+                        new Rectangle(x, y, width, height), color: Color.Orange, layerDepth: (y) / 100f);
+                    break;
+                default:
+                    sb.Draw(ShootTowerTexture, destinationRectangle:
+                        new Rectangle(x, y, width, height), color: Color.Orchid, layerDepth: (y) / 100f);
+                    break;
+            }
+        }
 
         //Method that draws one creep
         public static void DrawCreep(SpriteBatch sb, Creep target)
