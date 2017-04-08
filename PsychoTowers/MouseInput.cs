@@ -21,7 +21,9 @@ namespace PsychoTowers
         public Thread InputListener { get; set; }
 
         private MouseState prev;
-        
+
+        public int tower { get; private set; }
+
         public MouseInput()
         {
             X = 0;
@@ -34,6 +36,7 @@ namespace PsychoTowers
             InUse = true;
             InputListener = new Thread(DetectInput);
             InputListener.Start();
+            tower = 0;
 
             
         }
@@ -45,10 +48,26 @@ namespace PsychoTowers
                 MouseState mouse = Mouse.GetState();
                 X = (mouse.X - SpriteManager.DrawMapX) / 24;
                 Y = (mouse.Y - SpriteManager.DrawMapY) / 24;
+                if (mouse.ScrollWheelValue > prev.ScrollWheelValue)
+                {
+                    tower = (tower + 1) % 8;
+                }
+                else if (mouse.ScrollWheelValue < prev.ScrollWheelValue)
+                {
+                    tower = (tower + 7) % 8;
+                }
 
                 if (mouse.LeftButton == ButtonState.Pressed && prev.LeftButton == ButtonState.Released)
                 {
-                    Act(Command.PlaceWall, 0);
+                    if (X / 2 != X / 2.0 && Y / 2 == Y / 2.0)
+                    {
+                        Act(Command.PlaceTower, tower);
+                    }
+                    //Is it a wall?
+                    else
+                    {
+                        Act(Command.PlaceWall, 0);
+                    }
                 }
                 if (mouse.RightButton == ButtonState.Pressed && prev.RightButton == ButtonState.Released)
                 {

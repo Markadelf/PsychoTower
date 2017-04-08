@@ -72,6 +72,8 @@ namespace PsychoTowers
             SpriteManager.BackgroundTexture = Content.Load<Texture2D>("Background");
             SpriteManager.BacklightTexture = Content.Load<Texture2D>("Backlight");
             SpriteManager.BorderTexture = Content.Load<Texture2D>("Border");
+            SpriteManager.PanelTexture = Content.Load<Texture2D>("Panel");
+
 
             SpriteManager.CreepDownTexture = Content.Load<Texture2D>("CreepRight");
             SpriteManager.CreepRightTexture = Content.Load<Texture2D>("CreepRight");
@@ -178,8 +180,13 @@ namespace PsychoTowers
             spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack);
             SpriteManager.Update((float) gameTime.ElapsedGameTime.TotalSeconds);
             SpriteManager.DrawMap(spriteBatch, active);
+            if (PlayerOne != null)
+            {
+                SpriteManager.DrawSidePannel(spriteBatch, PlayerOne);
+                if (PlayerOne.PlayerInput != null && PlayerOne.PlayerInput.InUse)
+                    SpriteManager.DrawCursor(spriteBatch, PlayerOne.PlayerInput);
+            }
             spriteBatch.End();
-
             base.Draw(gameTime);
         }
     }

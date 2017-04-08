@@ -27,6 +27,8 @@ namespace PsychoTowers
 
         public static Texture2D BackgroundTexture { get; set; }
         public static Texture2D BacklightTexture { get; set; }
+        public static Texture2D PanelTexture { get; set; }
+
 
         public static Texture2D EmptyTowerSlotTexture { get; set; }
         public static Texture2D ShootTowerTexture { get; set; }
@@ -76,8 +78,8 @@ namespace PsychoTowers
         public const int DrawMapHeight  = 19 * 24;
         public const int DrawMapScale = 24;
 
-        public const int DrawPanelX = 516;
-        public const int DrawPanelWidth = 21 * DrawMapScale;
+        public const int DrawPanelX = 528;
+        public const int DrawPanelWidth = 7 * 24;
         public const int DrawPanelY = 12;
         public const int DrawPanelHeight = 19 * 24;
 
@@ -96,133 +98,135 @@ namespace PsychoTowers
 
         public static void DrawMap(SpriteBatch sb, Map mapdata)
         {
-            //Draw background to board
-            sb.Draw(BackgroundTexture, destinationRectangle: new Rectangle(DrawMapX, DrawMapY, DrawMapWidth, DrawMapHeight), layerDepth: 0, color: Color.SandyBrown);
-            sb.Draw(BorderTexture, destinationRectangle: new Rectangle(DrawMapX, DrawMapY, DrawMapWidth, DrawMapHeight), layerDepth: 1, color: Color.SandyBrown);
-            sb.Draw(BacklightTexture, destinationRectangle: new Rectangle(0, 0, 720, 480), layerDepth: .99f, color: new Color(160, 140, 120));
-
-
-            //Draw Path
-            //for (int i = 0; i < mapdata.TileData.GetLength(0); i++)
-            //{
-            //    for (int j = 0; j < mapdata.TileData.GetLength(1); j++)
-            //    {
-            //        switch (mapdata.TeamTwoPath[i, j])
-            //        {
-            //            case Direction.Right:
-            //                sb.Draw(SquareTestTexture, new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale, DrawMapScale, DrawMapScale), Color.Red);
-            //                break;
-            //            case Direction.Left:
-            //                sb.Draw(SquareTestTexture, new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale, DrawMapScale, DrawMapScale), Color.Blue);
-            //                break;
-            //            case Direction.Up:
-            //                sb.Draw(SquareTestTexture, new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale, DrawMapScale, DrawMapScale), Color.Green);
-            //                break;
-            //            case Direction.Down:
-            //                sb.Draw(SquareTestTexture, new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale, DrawMapScale, DrawMapScale), Color.HotPink);
-            //                break;
-            //            default:
-            //                break;
-            //        }
-            //    }
-            //}
-
-            //Draw Walls
-            for (int i = 0; i < mapdata.TileData.GetLength(0); i++)
+            lock (mapdata)
             {
-                for (int j = 0; j < mapdata.TileData.GetLength(1); j++)
+                //Draw background to board
+                sb.Draw(BackgroundTexture, destinationRectangle: new Rectangle(DrawMapX, DrawMapY, DrawMapWidth, DrawMapHeight), layerDepth: 0, color: Color.SandyBrown);
+                sb.Draw(BorderTexture, destinationRectangle: new Rectangle(DrawMapX, DrawMapY, DrawMapWidth, DrawMapHeight), layerDepth: 1, color: Color.SandyBrown);
+                sb.Draw(BacklightTexture, destinationRectangle: new Rectangle(0, 0, 720, 480), layerDepth: .99f, color: new Color(160, 140, 120));
+
+
+                //Draw Path
+                //for (int i = 0; i < mapdata.TileData.GetLength(0); i++)
+                //{
+                //    for (int j = 0; j < mapdata.TileData.GetLength(1); j++)
+                //    {
+                //        switch (mapdata.TeamTwoPath[i, j])
+                //        {
+                //            case Direction.Right:
+                //                sb.Draw(SquareTestTexture, new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale, DrawMapScale, DrawMapScale), Color.Red);
+                //                break;
+                //            case Direction.Left:
+                //                sb.Draw(SquareTestTexture, new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale, DrawMapScale, DrawMapScale), Color.Blue);
+                //                break;
+                //            case Direction.Up:
+                //                sb.Draw(SquareTestTexture, new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale, DrawMapScale, DrawMapScale), Color.Green);
+                //                break;
+                //            case Direction.Down:
+                //                sb.Draw(SquareTestTexture, new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale, DrawMapScale, DrawMapScale), Color.HotPink);
+                //                break;
+                //            default:
+                //                break;
+                //        }
+                //    }
+                //}
+
+                //Draw Walls
+                for (int i = 0; i < mapdata.TileData.GetLength(0); i++)
                 {
-                    if (mapdata.TileData[i, j].HasFlag(TileProperties.Blocked))
+                    for (int j = 0; j < mapdata.TileData.GetLength(1); j++)
                     {
-                        if (i < 2 || i > mapdata.TileData.GetLength(0) - 3 || j == 0 || j == mapdata.TileData.GetLength(1) - 1)
-                            sb.Draw(WallTexture, destinationRectangle: new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale, DrawMapScale, DrawMapScale), 
-                                color: Color.Black, layerDepth: j / 100f);
-                        else if (!(i / 2 != i / 2.0 && j / 2 == j / 2.0))
-                            sb.Draw(WallTexture, destinationRectangle: new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale - 8, DrawMapScale, DrawMapScale + 8), 
-                                color: Color.White, layerDepth: j / 100f);
+                        if (mapdata.TileData[i, j].HasFlag(TileProperties.Blocked))
+                        {
+                            if (i < 2 || i > mapdata.TileData.GetLength(0) - 3 || j == 0 || j == mapdata.TileData.GetLength(1) - 1)
+                                sb.Draw(WallTexture, destinationRectangle: new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale, DrawMapScale, DrawMapScale),
+                                    color: Color.Black, layerDepth: j / 100f);
+                            else if (!(i / 2 != i / 2.0 && j / 2 == j / 2.0))
+                                sb.Draw(WallTexture, destinationRectangle: new Rectangle(DrawMapX + i * DrawMapScale, DrawMapY + j * DrawMapScale - 8, DrawMapScale, DrawMapScale + 8),
+                                    color: Color.White, layerDepth: j / 100f);
+                        }
                     }
                 }
-            }
 
 
 
 
 
-            
-
-            //Draw Team Cores
-            if(FlagTimer > .44f)
-            {
-                sb.Draw(TeamCoreTexture, sourceRectangle: new Rectangle(48, 0, 24, 24), destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamOneCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOneCore.Y * DrawMapScale) + 4,
-                DrawMapScale, DrawMapScale), color: Color.Red, layerDepth: (mapdata.TeamOneCore.Y / 100f));
-                sb.Draw(TeamCoreTexture, sourceRectangle: new Rectangle(48, 0, 24, 24), destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamTwoCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwoCore.Y * DrawMapScale) + 4,
-                    DrawMapScale, DrawMapScale), color: Color.Blue, layerDepth: (mapdata.TeamTwoCore.Y / 100f));
-            }
-            else if(FlagTimer > .22f)
-            {
-                sb.Draw(TeamCoreTexture, sourceRectangle: new Rectangle(24, 0, 24, 24), destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamOneCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOneCore.Y * DrawMapScale) + 4,
-                   DrawMapScale, DrawMapScale), color: Color.Red, layerDepth: (mapdata.TeamOneCore.Y / 100f));
-                sb.Draw(TeamCoreTexture, sourceRectangle: new Rectangle(24, 0, 24, 24), destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamTwoCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwoCore.Y * DrawMapScale) + 4,
-                    DrawMapScale, DrawMapScale), color: Color.Blue, layerDepth: (mapdata.TeamTwoCore.Y / 100f));
-            }
-            else
-            {
-                sb.Draw(TeamCoreTexture, sourceRectangle: new Rectangle(0, 0, 24, 24), destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamOneCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOneCore.Y * DrawMapScale) + 4,
-                    DrawMapScale, DrawMapScale), color: Color.Red, layerDepth: (mapdata.TeamOneCore.Y / 100f));
-                sb.Draw(TeamCoreTexture, sourceRectangle: new Rectangle(0, 0, 24, 24), destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamTwoCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwoCore.Y * DrawMapScale) + 4,
-                    DrawMapScale, DrawMapScale), color: Color.Blue, layerDepth: (mapdata.TeamTwoCore.Y / 100f));
-            }
 
 
-
-            //Draw Team Creeps
-            for (int i = 0; i < mapdata.TeamOne.Count; i++)
-            {
-                sb.Draw(SquareTestTexture,
-                    destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamOne[i].X * DrawMapScale) + (DrawMapScale * mapdata.TeamOne[i].Health / mapdata.TeamOne[i].MaxHealth), DrawMapY + (int)(mapdata.TeamOne[i].Y * DrawMapScale) 
-                   + DrawMapScale + 2, DrawMapScale - (DrawMapScale * mapdata.TeamOne[i].Health / mapdata.TeamOne[i].MaxHealth), 2), color: Color.Red, layerDepth: 1);
-                sb.Draw(SquareTestTexture, destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamOne[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOne[i].Y * DrawMapScale)
-                    + DrawMapScale + 2, (DrawMapScale * mapdata.TeamOne[i].Health / mapdata.TeamOne[i].MaxHealth), 2), color: Color.Green, layerDepth: 1);
-                DrawCreep(sb, mapdata.TeamOne[i]);
-            }
-            for (int i = 0; i < mapdata.TeamTwo.Count; i++)
-            {
-                sb.Draw(SquareTestTexture, 
-                    destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamTwo[i].X * DrawMapScale) + (DrawMapScale * mapdata.TeamTwo[i].Health / mapdata.TeamTwo[i].MaxHealth), 
-                    DrawMapY + (int)(mapdata.TeamTwo[i].Y * DrawMapScale) + DrawMapScale + 2, DrawMapScale - (DrawMapScale * mapdata.TeamTwo[i].Health / mapdata.TeamTwo[i].MaxHealth), 2), 
-                    color: Color.Red, layerDepth: 1);
-                sb.Draw(SquareTestTexture, destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamTwo[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwo[i].Y * DrawMapScale)
-                    + DrawMapScale + 2, (DrawMapScale * mapdata.TeamTwo[i].Health / mapdata.TeamTwo[i].MaxHealth), 2), color: Color.Green, layerDepth: 1);
-                DrawCreep(sb, mapdata.TeamTwo[i]);
-
-            }
-
-            //Draw Towers
-            for (int i = 0; i < mapdata.TowerData.GetLength(0); i++)
-            {
-                for (int j = 0; j < mapdata.TowerData.GetLength(1); j++)
+                //Draw Team Cores
+                if (FlagTimer > .44f)
                 {
-                    if (mapdata.TowerData[i, j] == null)
-                        sb.Draw(EmptyTowerSlotTexture, destinationRectangle:
-                            new Rectangle(DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale, DrawMapScale, DrawMapScale), color: Color.Brown, layerDepth: (j * 2 + 2) / 100f);
-                    else
-                        DrawTower(sb, mapdata.TowerData[i, j].Aura, DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale - 8, DrawMapScale, DrawMapScale + 8);
+                    sb.Draw(TeamCoreTexture, sourceRectangle: new Rectangle(48, 0, 24, 24), destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamOneCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOneCore.Y * DrawMapScale) + 4,
+                    DrawMapScale, DrawMapScale), color: Color.Red, layerDepth: (mapdata.TeamOneCore.Y / 100f));
+                    sb.Draw(TeamCoreTexture, sourceRectangle: new Rectangle(48, 0, 24, 24), destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamTwoCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwoCore.Y * DrawMapScale) + 4,
+                        DrawMapScale, DrawMapScale), color: Color.Blue, layerDepth: (mapdata.TeamTwoCore.Y / 100f));
                 }
+                else if (FlagTimer > .22f)
+                {
+                    sb.Draw(TeamCoreTexture, sourceRectangle: new Rectangle(24, 0, 24, 24), destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamOneCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOneCore.Y * DrawMapScale) + 4,
+                       DrawMapScale, DrawMapScale), color: Color.Red, layerDepth: (mapdata.TeamOneCore.Y / 100f));
+                    sb.Draw(TeamCoreTexture, sourceRectangle: new Rectangle(24, 0, 24, 24), destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamTwoCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwoCore.Y * DrawMapScale) + 4,
+                        DrawMapScale, DrawMapScale), color: Color.Blue, layerDepth: (mapdata.TeamTwoCore.Y / 100f));
+                }
+                else
+                {
+                    sb.Draw(TeamCoreTexture, sourceRectangle: new Rectangle(0, 0, 24, 24), destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamOneCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOneCore.Y * DrawMapScale) + 4,
+                        DrawMapScale, DrawMapScale), color: Color.Red, layerDepth: (mapdata.TeamOneCore.Y / 100f));
+                    sb.Draw(TeamCoreTexture, sourceRectangle: new Rectangle(0, 0, 24, 24), destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamTwoCore.X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwoCore.Y * DrawMapScale) + 4,
+                        DrawMapScale, DrawMapScale), color: Color.Blue, layerDepth: (mapdata.TeamTwoCore.Y / 100f));
+                }
+
+
+
+                //Draw Team Creeps
+                for (int i = 0; i < mapdata.TeamOne.Count; i++)
+                {
+                    sb.Draw(SquareTestTexture,
+                        destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamOne[i].X * DrawMapScale) + (DrawMapScale * mapdata.TeamOne[i].Health / mapdata.TeamOne[i].MaxHealth), DrawMapY + (int)(mapdata.TeamOne[i].Y * DrawMapScale)
+                       + DrawMapScale + 2, DrawMapScale - (DrawMapScale * mapdata.TeamOne[i].Health / mapdata.TeamOne[i].MaxHealth), 2), color: Color.Red, layerDepth: 1);
+                    sb.Draw(SquareTestTexture, destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamOne[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamOne[i].Y * DrawMapScale)
+                        + DrawMapScale + 2, (DrawMapScale * mapdata.TeamOne[i].Health / mapdata.TeamOne[i].MaxHealth), 2), color: Color.Green, layerDepth: 1);
+                    DrawCreep(sb, mapdata.TeamOne[i]);
+                }
+                for (int i = 0; i < mapdata.TeamTwo.Count; i++)
+                {
+                    sb.Draw(SquareTestTexture,
+                        destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamTwo[i].X * DrawMapScale) + (DrawMapScale * mapdata.TeamTwo[i].Health / mapdata.TeamTwo[i].MaxHealth),
+                        DrawMapY + (int)(mapdata.TeamTwo[i].Y * DrawMapScale) + DrawMapScale + 2, DrawMapScale - (DrawMapScale * mapdata.TeamTwo[i].Health / mapdata.TeamTwo[i].MaxHealth), 2),
+                        color: Color.Red, layerDepth: 1);
+                    sb.Draw(SquareTestTexture, destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.TeamTwo[i].X * DrawMapScale), DrawMapY + (int)(mapdata.TeamTwo[i].Y * DrawMapScale)
+                        + DrawMapScale + 2, (DrawMapScale * mapdata.TeamTwo[i].Health / mapdata.TeamTwo[i].MaxHealth), 2), color: Color.Green, layerDepth: 1);
+                    DrawCreep(sb, mapdata.TeamTwo[i]);
+
+                }
+
+                //Draw Towers
+                for (int i = 0; i < mapdata.TowerData.GetLength(0); i++)
+                {
+                    for (int j = 0; j < mapdata.TowerData.GetLength(1); j++)
+                    {
+                        if (mapdata.TowerData[i, j] == null)
+                            sb.Draw(EmptyTowerSlotTexture, destinationRectangle:
+                                new Rectangle(DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale, DrawMapScale, DrawMapScale), color: Color.Brown, layerDepth: (j * 2 + 2) / 100f);
+                        else
+                            DrawTower(sb, mapdata.TowerData[i, j].Aura, DrawMapX + (2 * i + 3) * DrawMapScale, DrawMapY + (j * 2 + 2) * DrawMapScale - 8, DrawMapScale, DrawMapScale + 8, (j * 2 + 2) / 100f);
+                    }
+                }
+
+                //Draw Team Creeps
+                for (int i = 0; i < mapdata.Projectiles.Count; i++)
+                {
+                    sb.Draw(SquareTestTexture, destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.Projectiles[i].X * DrawMapScale + 10), DrawMapY + (int)(mapdata.Projectiles[i].Y * DrawMapScale + 10), 4, 4), color: Color.Red, layerDepth: 1);
+                }
+
             }
-
-            //Draw Team Creeps
-            for (int i = 0; i < mapdata.Projectiles.Count; i++)
-            {
-                sb.Draw(SquareTestTexture, destinationRectangle: new Rectangle(DrawMapX + (int)(mapdata.Projectiles[i].X * DrawMapScale + 10), DrawMapY + (int)(mapdata.Projectiles[i].Y * DrawMapScale + 10), 4, 4), color: Color.Red, layerDepth: 1);
-            }
-
-
         }//End Draw
 
 
         public static void DrawSidePannel(SpriteBatch sb, Player player)
         {
-
+            sb.Draw(PanelTexture, destinationRectangle: new Rectangle(DrawPanelX, DrawPanelY, DrawPanelWidth, DrawPanelHeight), layerDepth: .991f, color: Color.SandyBrown);
         }
 
         public static void DrawSidePannel(SpriteBatch sb, Player playerOne, Player playerTwo)
@@ -230,43 +234,49 @@ namespace PsychoTowers
 
         }
 
-        public static void DrawTower(SpriteBatch sb, TileProperties type, int x, int y, int width, int height)
+        public static void DrawTower(SpriteBatch sb, TileProperties type, int x, int y, int width, int height, float depth)
         {
             switch (type)
             {
                 case TileProperties.AttackBuff:
                     sb.Draw(BuffTowerTexture, destinationRectangle:
-                        new Rectangle(x, y, width, height), color: Color.Crimson, layerDepth: (y) / 100f);
+                        new Rectangle(x, y, width, height), color: Color.Crimson, layerDepth: depth);
                     break;
                 case TileProperties.AttackNerf:
                     sb.Draw(NerfTowerTexture, destinationRectangle:
-                        new Rectangle(x, y, width, height), color: Color.LightCoral, layerDepth: (y) / 100f);
+                        new Rectangle(x, y, width, height), color: Color.LightCoral, layerDepth: depth);
                     break;
                 case TileProperties.ArmorBuff:
                     sb.Draw(BuffTowerTexture, destinationRectangle:
-                        new Rectangle(x, y, width, height), color: Color.RoyalBlue, layerDepth: (y) / 100f);
+                        new Rectangle(x, y, width, height), color: Color.RoyalBlue, layerDepth: depth);
                     break;
                 case TileProperties.ArmorNerf:
                     sb.Draw(NerfTowerTexture, destinationRectangle:
-                        new Rectangle(x, y, width, height), color: Color.DeepSkyBlue, layerDepth: (y) / 100f);
+                        new Rectangle(x, y, width, height), color: Color.DeepSkyBlue, layerDepth: depth);
                     break;
                 case TileProperties.SpeedBuff:
                     sb.Draw(BuffTowerTexture, destinationRectangle:
-                        new Rectangle(x, y, width, height), color: Color.SpringGreen, layerDepth: (y) / 100f);
+                        new Rectangle(x, y, width, height), color: Color.SpringGreen, layerDepth: depth);
                     break;
                 case TileProperties.SpeedNerf:
                     sb.Draw(NerfTowerTexture, destinationRectangle:
-                        new Rectangle(x, y, width, height), color: Color.YellowGreen, layerDepth: (y) / 100f);
+                        new Rectangle(x, y, width, height), color: Color.YellowGreen, layerDepth: depth);
                     break;
                 case TileProperties.DoubleXP:
                     sb.Draw(ExpTowerTexture, destinationRectangle:
-                        new Rectangle(x, y, width, height), color: Color.Orange, layerDepth: (y) / 100f);
+                        new Rectangle(x, y, width, height), color: Color.Orange, layerDepth: depth);
                     break;
                 default:
                     sb.Draw(ShootTowerTexture, destinationRectangle:
-                        new Rectangle(x, y, width, height), color: Color.Orchid, layerDepth: (y) / 100f);
+                        new Rectangle(x, y, width, height), color: Color.Orchid, layerDepth: depth);
                     break;
             }
+        }
+
+        public static void DrawCursor(SpriteBatch sb, InputMethod cursor)
+        {
+            sb.Draw(AuraTexture, destinationRectangle:
+                        new Rectangle(DrawMapX + (int)(cursor.X * DrawMapScale), DrawMapY + (int)(cursor.Y * DrawMapScale), DrawMapScale, DrawMapScale), color: new Color(Color.Yellow, .25f), layerDepth: 1f);
         }
 
         //Method that draws one creep
