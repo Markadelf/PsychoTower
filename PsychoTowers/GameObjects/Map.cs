@@ -295,7 +295,7 @@ namespace PsychoTowers
             TileData[x, y] += (int)TileProperties.Blocked;
             TeamCore target = TeamTwoCore;
             Direction[,] path = new Direction[TileData.GetLength(0), TileData.GetLength(1)];
-            int[,] count = new int[TileData.GetLength(0), TileData.GetLength(1)];
+            float[,] count = new float[TileData.GetLength(0), TileData.GetLength(1)];
             int max = TileData.GetLength(0) * TileData.GetLength(1);
             for (int i = 0; i < path.GetLength(0); i++)
             {
@@ -308,7 +308,7 @@ namespace PsychoTowers
 
             count[target.X, target.Y] = 0;
 
-            RecursePath(path, count, target.X, target.Y);
+            CalculatePath(path, count, target.X, target.Y);
             if (count[TeamOneCore.X, TeamOneCore.Y] != max)
             {
                 RedefinePaths();
@@ -329,7 +329,7 @@ namespace PsychoTowers
             else
                 return false;
             Direction[,] path = new Direction[TileData.GetLength(0), TileData.GetLength(1)];
-            int[,] count = new int[TileData.GetLength(0), TileData.GetLength(1)];
+            float[,] count = new float[TileData.GetLength(0), TileData.GetLength(1)];
             int max = TileData.GetLength(0) * TileData.GetLength(1);
             for (int i = 0; i < path.GetLength(0); i++)
             {
@@ -342,7 +342,7 @@ namespace PsychoTowers
 
             count[target.X, target.Y] = 0;
 
-            RecursePath(path, count, target.X, target.Y);
+            CalculatePath(path, count, target.X, target.Y);
             if(team == Team.Team1)
             {
                 if(count[TeamOneCore.X, TeamOneCore.Y] != max)
@@ -362,38 +362,46 @@ namespace PsychoTowers
             return false;
         }
 
-        //A recursive function that finds the shortest path from to any given square
-        private void RecursePath(Direction[,] path, int[,] count, int x, int y)
+        //A function that finds the shortest path from to any given square
+        private void CalculatePath(Direction[,] path, float[,] count, int goalX, int goalY)
         {
-            //Check Up
-            if (count[x, y] + 1 < count[x , y - 1] && !TileData[x, y - 1].HasFlag(TileProperties.Blocked))
+            Queue<Tuple<int, int>> nodes = new Queue<Tuple<int, int>>();
+            nodes.Enqueue(new Tuple<int, int>(goalX, goalY));
+            while (nodes.Count != 0)
             {
-                path[x, y - 1] = Direction.Down;
-                count[x, y - 1] = count[x, y] + 1;
-                RecursePath(path, count, x, y - 1);
+                var node = nodes.Dequeue();
+                int x = node.Item1;
+                int y = node.Item2;
+                //Check Left
+                if (count[x, y] + 1 + Math.Pow((x - 11f) * (y - 9f), 2) / 10000 < count[x - 1, y] && !TileData[x - 1, y].HasFlag(TileProperties.Blocked))
+                {
+                    path[x - 1, y] = Direction.Right;
+                    count[x - 1, y] = count[x, y] + 1 + (float) Math.Pow((x - 11f) * (y - 9f), 2) / 10000;
+                    nodes.Enqueue(new Tuple<int, int>(x - 1, y));
+                }
+                //Check Right
+                if (count[x, y] + 1 + Math.Pow((x - 9f) * (y - 9f), 2) / 10000 < count[x + 1, y] && !TileData[x + 1, y].HasFlag(TileProperties.Blocked))
+                {
+                    path[x + 1, y] = Direction.Left;
+                    count[x + 1, y] = count[x, y] + 1 + (float) Math.Pow((x - 9f) * (y - 9f), 2) / 10000;
+                    nodes.Enqueue(new Tuple<int, int>(x + 1, y));
+                }
+                //Check Up
+                if (count[x, y] + 1 + Math.Pow((y - 10f) * (x - 10f), 2) / 10000 < count[x, y - 1] && !TileData[x, y - 1].HasFlag(TileProperties.Blocked))
+                {
+                    path[x, y - 1] = Direction.Down;
+                    count[x, y - 1] = count[x, y] + 1 + (float) Math.Pow((y - 10f) * (x - 10f), 2) / 10000;
+                    nodes.Enqueue(new Tuple<int,int>(x, y - 1));
+                }
+                //Check Down
+                if (count[x, y] + 1 + Math.Pow((y - 8f) * (x - 10f), 2) / 10000 < count[x, y + 1] && !TileData[x, y + 1].HasFlag(TileProperties.Blocked))
+                {
+                    path[x, y + 1] = Direction.Up;
+                    count[x, y + 1] = count[x, y] + 1 + (float) Math.Pow((y - 8f) * (x - 10f), 2) / 10000;
+                    nodes.Enqueue(new Tuple<int, int>(x, y + 1));
+                }
+                
             }
-            //Check Down
-            if (count[x, y] + 1 < count[x, y + 1] && !TileData[x, y + 1].HasFlag(TileProperties.Blocked))
-            {
-                path[x, y + 1] = Direction.Up;
-                count[x, y + 1] = count[x, y] + 1;
-                RecursePath(path, count, x, y + 1);
-            }
-            //Check Left
-            if(count[x,y] + 1 < count[x - 1, y] && !TileData[x - 1, y].HasFlag(TileProperties.Blocked))
-            {
-                path[x - 1, y] = Direction.Right;
-                count[x - 1, y] = count[x, y] + 1;
-                RecursePath(path, count, x - 1, y);
-            }
-            //Check Right
-            if (count[x, y] + 1 < count[x + 1, y] && !TileData[x + 1, y].HasFlag(TileProperties.Blocked))
-            {
-                path[x + 1, y] = Direction.Left;
-                count[x + 1, y] = count[x, y] + 1;
-                RecursePath(path, count, x + 1, y);
-            }
-            
         }
 
         private void EnsureHomoginity()
